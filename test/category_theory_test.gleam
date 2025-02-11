@@ -9,8 +9,14 @@ pub fn main() {
   gleeunit.main()
 }
 
-/// Useful function for testing
-/// range(0, 3) = [0, 1, 2, 3]
+/// Useful function for testing, generating a list that starts from the first parameter and ends at the second.
+/// ### Examples
+/// ```gleam
+/// range(0, 3)
+/// // -> [0, 1, 2, 3]
+/// range(5, 9)
+/// // -> [5, 6, 7, 8, 9]
+/// ```
 fn range(start: Int, finish: Int) -> List(Int) {
   case finish - start {
     0 -> [start]
@@ -43,8 +49,6 @@ pub fn composition_test() {
   |> should.equal(False)
 }
 
-///  f . id == f \
-///  id . f == f
 pub fn composition_rules_test() {
   io.println("Testing the composition rules")
   let f = fn(x: Int) { x * 5 }
