@@ -59,3 +59,13 @@ pub fn composition_rules_test() {
     |> should.equal(f(i))
   })
 }
+
+pub fn unit_function_test() {
+  io.println("Testing unit function")
+
+  ct.unit(5)
+  |> should.equal(Nil)
+
+  ct.unit("abc")
+  |> should.equal(Nil)
+}

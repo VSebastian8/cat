@@ -1,5 +1,7 @@
 name = "category_theory"
 version = "1.0.0"
+authors = ["VSebastian8 <https://github.com/VSebastian8>"]
+description = "Category theory concepts in gleam. "
 
 # Fill out these fields if you intend to generate HTML documentation or publish
 # your project to the Hex package manager.

@@ -16,6 +16,10 @@ pub fn compose(g: fn(b) -> c, f: fn(a) -> b) -> fn(a) -> c {
   fn(x: a) { g(f(x)) }
 }
 
+pub fn unit(_: t) {
+  Nil
+}
+
 pub fn main() {
   io.println("Category Theory!")
   io.println("Identity Function:")
