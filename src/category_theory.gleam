@@ -1,7 +1,7 @@
 import gleam/io
+import gleam/list
 
-/// ### Identity Function 
-/// A unit of composition.
+/// The `identity function` is a `unit of composition`.
 /// ```haskell
 /// id :: a -> a
 /// id a = a
@@ -20,8 +20,7 @@ pub fn id(x: a) -> a {
   x
 }
 
-/// ### Composition Function
-/// Given function `f` that takes an argument of type A and returns a B, and another function `g` that takes a B and returns a C, you can `compose` them by `passing the result of f to g`. 
+/// Given a function `f` that takes an argument of type A and returns a B, and another function `g` that takes a B and returns a C, you can `compose` them by `passing the result of f to g`. 
 /// ```haskell
 /// (.) :: (b -> c) -> (a -> b) -> (a -> c)
 /// (g . f) x = f (g x)
@@ -50,8 +49,7 @@ pub fn absurd(_: Void) -> a {
   panic
 }
 
-/// ### Unit Function
-/// From any type to a unit (Nil in gleam)
+/// A function from any type to a unit (Nil in gleam)
 /// ```haskell
 /// unit :: a -> ()
 /// unit _ = ()
@@ -74,6 +72,40 @@ pub fn unit(_: t) {
 pub type Boole {
   TrueB
   FalseB
+}
+
+/// A monoid is a `set` with a `binary operation` or a a `single object category` with a `set of morphisms` that follow the rules of composition.
+/// ```haskell
+/// class Monoid m where
+///   mempty  :: m
+///   mappend :: m -> m -> m
+/// ```
+/// Laws:
+/// - mappend mempty x = x
+/// - mappend x mempty = x
+/// - mappend x (mappend y z) = mappend (mappend x y) z
+/// - mconcat = foldr mappend mempty
+/// ### Examples
+/// ```gleam
+/// let int_sum_monoid = Monoid(mempty: 0, mappend: fn(x: Int, y: Int) { x + y })
+/// int_sum_monoid
+/// |> mconcat([2, 3, int_sum_monoid.mempty, 4])
+/// |> int_sum_monoid.mappend(10)
+/// // -> 19
+/// let bool_and_monoid = Monoid(mempty: True, mappend: bool.and)
+/// True
+/// |> bool_and_monoid.mappend(False)
+/// |> bool_and_monoid.mappend(bool_and_monoid.mempty)
+/// // -> False
+/// ```
+pub type Monoid(m) {
+  Monoid(mempty: m, mappend: fn(m, m) -> m)
+}
+
+// Separate function because gleam doesn't allow default implementations for record fields
+/// Fold a `list of monoids` using mappend. 
+pub fn mconcat(mono: Monoid(m), monoid_list: List(m)) -> m {
+  monoid_list |> list.fold(mono.mempty, mono.mappend)
 }
 
 pub fn main() {
