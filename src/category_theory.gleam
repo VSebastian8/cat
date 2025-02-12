@@ -160,6 +160,160 @@ pub fn return(x: a) -> Writer(a) {
   Writer(x, "")
 }
 
+/// Maybe type from Haskell (Option in gleam)
+/// ### Examples
+/// ```gleam
+/// let safe_div = fn(a, b) {
+///   case b != 0.0 {
+///     True -> Just(a /. b)
+///     False -> Nothing
+///   }
+/// }
+/// safe_div(3.0, 4.0)
+/// // -> Just(0,75)
+/// safe_div(3.0, 0.0)
+/// // -> Nothing
+/// ```
+pub type Maybe(a) {
+  Nothing
+  Just(a)
+}
+
+/// `Composition` for the Maybe type 
+/// ### Examples
+/// ```gleam
+/// let safe_reciprocal = fn(x) {
+///   case x != 0.0 {
+///     True -> Just(1.0 /. x)
+///     False -> Nothing
+///   }
+/// }
+/// let safe_root = fn(x) {
+///   case x >=. 0.0 {
+///     True -> Just(x |> float.square_root() |> result.unwrap(0.0))
+///     False -> Nothing
+///   }
+/// }
+/// let safe_reciprocal_root = maybe_compose(safe_reciprocal, safe_root)
+/// // -> a function that calculates sqrt(1/x)
+/// safe_reciprocal_root(0.25)
+/// // -> Just(2.0)
+/// safe_reciprocal_root(0.0)
+/// // -> Nothing
+/// safe_reciprocal_root(-2.0)
+/// // -> Nothing
+/// ```
+pub fn maybe_compose(
+  m1: fn(a) -> Maybe(b),
+  m2: fn(b) -> Maybe(c),
+) -> fn(a) -> Maybe(c) {
+  fn(x) {
+    case m1(x) {
+      Nothing -> Nothing
+      Just(y) -> m2(y)
+    }
+  }
+}
+
+/// The `idenitity morphism` for the Maybe type.
+/// ### Examples
+/// ```gleam
+/// maybe_id(25)
+/// // -> Just(25)
+/// maybe_id(Nothing)
+/// // -> Just(Nothing)
+/// ```
+pub fn maybe_id(x: a) -> Maybe(a) {
+  Just(x)
+}
+
+/// Canonical implementation of a `product` (tuple)
+/// Examples
+/// ```gleam
+/// let even_to_string = fn(x: Int) -> Pair(String, Bool) {
+///   Pair(int.to_string(x), x % 2 == 0)
+/// }
+/// even_to_string(82).fst
+/// // -> "82"
+/// even_to_string(82).snd
+/// // -> True
+/// even_to_string(83).snd
+/// // -> False
+/// ```
+pub type Pair(a, b) {
+  Pair(fst: a, snd: b)
+}
+
+/// Produces the factorizing function from a `candidate` c with `two projections` p and q to the best product (tuple / pair). \
+/// Property: p and q can be `reconstructed` from the canonical product  \
+/// With m = product_factorizer(p, q), we have:
+/// - p(x) = m(x).fst
+/// - q(x) = m(x).snd
+/// ### Examples
+/// ```gleam
+/// // Given the candidate Int with two projections to Int and Bool
+/// let p = fn(x: Int) {x}
+/// let q = fn(_: Int) {True}
+/// // We show that Pair(Int, Bool) is a better product by finding the mapping m:
+/// let m = product_factorizer(p, q)
+/// m(7)
+/// // -> Pair(7, True)  
+/// ```
+pub fn product_factorizer(p: fn(c) -> a, q: fn(c) -> b) -> fn(c) -> Pair(a, b) {
+  fn(x) { Pair(fst: p(x), snd: q(x)) }
+}
+
+/// Canonical implementation of a `coproduct` 
+/// ```haskell
+/// data Either a b = Left a | Right b
+/// ```
+/// ### Examples
+/// ```gleam
+/// let check_positive = fn(x: Int) -> Either(Int, String) {
+///   case x >= 0 {
+///     True -> Left(x)
+///     False -> Right("negative number")
+///   }
+/// }
+/// check_positive(12)
+/// // -> Left(12)
+/// check_positive(-3)
+/// // -> Right("negative number")
+/// ```
+pub type Either(a, b) {
+  Left(a)
+  Right(b)
+}
+
+/// Produces the factorizing function from a `candidate` c with `two injections` i and j to the best coproduct (either). \
+/// Property: i and j can be `reconstructed` from the canonical coproduct e  \
+/// With m = coproduct_factorizer(i, j), we have:
+/// - i(x) = m(Left(x))
+/// - j(x) = m(Right(x))
+/// ### Examples
+/// ```gleam
+/// // Given the candidate #(Int, Bool) with two injections from Int and Bool
+/// let i = fn(x: Int) {#(x, False)}
+/// let j = fn(x: Bool) {#(9, x)}
+/// // We show that Either(Int, Bool) is a better coproduct by finding the mapping m:
+/// let m = coproduct_factorizer(i, j)
+/// m(Left(2))
+/// // -> #(2, True)  
+/// m(Right(False))
+/// // -> #(9, False)  
+/// ```
+pub fn coproduct_factorizer(
+  i: fn(a) -> c,
+  j: fn(b) -> c,
+) -> fn(Either(a, b)) -> c {
+  fn(e) {
+    case e {
+      Left(a) -> i(a)
+      Right(b) -> j(b)
+    }
+  }
+}
+
 pub fn main() {
   io.println("Category Theory!")
 }
