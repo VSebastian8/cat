@@ -4,6 +4,7 @@ import gleam/int
 import gleam/io
 import gleam/list
 import gleam/option
+import gleam/string
 import gleeunit
 import gleeunit/should
 import instances as inst
@@ -131,4 +132,18 @@ pub fn monoid_instances_test() {
 
   mono_maybe.mappend(option.Some("abc"), mono_maybe.mempty)
   |> should.equal(option.None)
+}
+
+pub fn writer_test() {
+  io.debug("Testing the writer type")
+
+  let up_case = fn(s: String) { ct.Writer(string.uppercase(s), "upCase ") }
+  let to_words = fn(s: String) { ct.Writer(string.split(s, " "), "toWords ") }
+  let process = ct.fish(up_case, to_words)
+
+  process("Anna has apples")
+  |> should.equal(ct.Writer(["ANNA", "HAS", "APPLES"], "upCase toWords "))
+
+  ct.return(27)
+  |> should.equal(ct.Writer(27, ""))
 }
