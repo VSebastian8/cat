@@ -1,5 +1,6 @@
+//// Module contains basic category concepts such as: composition, identity, unit, maybe, product, coproduct.
+
 import gleam/io
-import gleam/list
 
 /// The `identity function` is a `unit of composition`.
 /// ```haskell
@@ -63,101 +64,6 @@ pub fn absurd(_: Void) -> a {
 /// ```
 pub fn unit(_: t) {
   Nil
-}
-
-/// A `two-element set`
-/// ```haskell
-/// data Bool = True | False
-/// ```
-pub type Boole {
-  TrueB
-  FalseB
-}
-
-/// A monoid is a `set` with a `binary operation` or a a `single object category` with a `set of morphisms` that follow the rules of composition.
-/// ```haskell
-/// class Monoid m where
-///   mempty  :: m
-///   mappend :: m -> m -> m
-/// ```
-/// Laws:
-/// - mappend mempty x = x
-/// - mappend x mempty = x
-/// - mappend x (mappend y z) = mappend (mappend x y) z
-/// - mconcat = foldr mappend mempty
-/// ### Examples
-/// ```gleam
-/// let int_sum_monoid = Monoid(mempty: 0, mappend: fn(x: Int, y: Int) { x + y })
-/// int_sum_monoid
-/// |> mconcat([2, 3, int_sum_monoid.mempty, 4])
-/// |> int_sum_monoid.mappend(10)
-/// // -> 19
-/// let bool_and_monoid = Monoid(mempty: True, mappend: bool.and)
-/// True
-/// |> bool_and_monoid.mappend(False)
-/// |> bool_and_monoid.mappend(bool_and_monoid.mempty)
-/// // -> False
-/// ```
-pub type Monoid(m) {
-  Monoid(mempty: m, mappend: fn(m, m) -> m)
-}
-
-// Separate function because gleam doesn't allow default implementations for record fields
-/// Fold a `list of monoids` using mappend. 
-pub fn mconcat(mono: Monoid(m), monoid_list: List(m)) -> m {
-  monoid_list |> list.fold(mono.mempty, mono.mappend)
-}
-
-/// Encapsulates a pair whose first component is a `value` of arbitrary type a and the second component is a `string`. \
-/// Used to `embellish` the return values of functions.
-/// ### Examples
-/// ```gleam
-/// // Original function
-/// f = fn(x) {x * 2}
-/// // Embellished function
-/// f = fn(x) {Writer(x * 2, "doubled ")}
-/// ```
-pub type Writer(a) {
-  Writer(a, String)
-}
-
-/// `Composition` for the embellished functions that return the Writer type.
-/// ```haskell
-/// (>=>) :: (a -> Writer b) -> (b -> Writer c) -> (a -> Writer c)
-/// m1 >=> m2 = \x -> 
-///   let (y, s1) = m1 x
-///       (z, s2) = m2 y
-///   in (z, s1 ++ s2)
-/// ```
-/// ### Examples
-/// ```gleam
-/// let up_case = fn(s: String) { Writer(string.uppercase(s), "upCase ") }
-/// let to_words = fn(s: String) { Writer(string.split(s, " "), "toWords ") }
-/// let process = fish(up_case, to_words)
-/// process("Anna has apples")
-/// // -> Writer(["ANNA", "HAS", "APPLES"], "upCase toWords ")
-/// ```
-pub fn fish(
-  m1: fn(a) -> Writer(b),
-  m2: fn(b) -> Writer(c),
-) -> fn(a) -> Writer(c) {
-  fn(x) {
-    let Writer(y, s1) = m1(x)
-    let Writer(z, s2) = m2(y)
-    Writer(z, s1 <> s2)
-  }
-}
-
-/// The `identity morphism` for the Writer category.
-/// ### Examples
-/// ```gleam
-/// return(2)
-/// // -> Writer(2, "")
-/// return("abcd")
-/// // -> Writer("abcd", "") 
-/// ```
-pub fn return(x: a) -> Writer(a) {
-  Writer(x, "")
 }
 
 /// Maybe type from Haskell (Option in gleam)
