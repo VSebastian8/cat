@@ -1,9 +1,10 @@
 //// Module contains basic category concepts such as: composition, identity, unit, maybe, product, coproduct.
 
 import gleam/io
+import gleam/option.{type Option, None, Some}
 
 /// The `identity function` is a `unit of composition`.
-/// ```haskell
+/// ```
 /// id :: a -> a
 /// id a = a
 /// ```
@@ -22,7 +23,7 @@ pub fn id(x: a) -> a {
 }
 
 /// Given a function `f` that takes an argument of type A and returns a B, and another function `g` that takes a B and returns a C, you can `compose` them by `passing the result of f to g`. 
-/// ```haskell
+/// ```
 /// (.) :: (b -> c) -> (a -> b) -> (a -> c)
 /// (g . f) x = f (g x)
 /// ```
@@ -50,8 +51,8 @@ pub fn absurd(_: Void) -> a {
   panic
 }
 
-/// A function from any type to a unit (Nil in gleam)
-/// ```haskell
+/// A function from any type to a unit (Nil in gleam).
+/// ```
 /// unit :: a -> ()
 /// unit _ = ()
 /// ```
@@ -66,7 +67,119 @@ pub fn unit(_: t) {
   Nil
 }
 
-/// Maybe type from Haskell (Option in gleam)
+/// Canonical implementation of a `product` (tuple).
+/// Examples
+/// ```gleam
+/// let even_to_string = fn(x: Int) -> Pair(String, Bool) {
+///   Pair(int.to_string(x), x % 2 == 0)
+/// }
+/// even_to_string(82).fst
+/// // -> "82"
+/// even_to_string(82).snd
+/// // -> True
+/// even_to_string(83).snd
+/// // -> False
+/// ```
+pub type Pair(a, b) {
+  Pair(fst: a, snd: b)
+}
+
+/// Produces the factorizing function from a `candidate` c with `two projections` p and q to the best product (tuple / pair). \
+/// Property: p and q can be `reconstructed` from the canonical product  \
+/// With m = product_factorizer(p, q), we have:
+/// - p(x) = m(x).fst
+/// - q(x) = m(x).snd
+/// ### Examples
+/// ```gleam
+/// // Given the candidate Int with two projections to Int and Bool
+/// let p = fn(x: Int) {x}
+/// let q = fn(_: Int) {True}
+/// // We show that Pair(Int, Bool) is a better product by finding the mapping m:
+/// let m = product_factorizer(p, q)
+/// m(7)
+/// // -> Pair(7, True)  
+/// ```
+pub fn product_factorizer(p: fn(c) -> a, q: fn(c) -> b) -> fn(c) -> Pair(a, b) {
+  fn(x) { Pair(fst: p(x), snd: q(x)) }
+}
+
+/// Canonical implementation of a `coproduct` (sum type).
+/// ```
+/// data Either a b = Left a | Right b
+/// ```
+/// ### Examples
+/// ```gleam
+/// let check_positive = fn(x: Int) -> Either(Int, String) {
+///   case x >= 0 {
+///     True -> Left(x)
+///     False -> Right("negative number")
+///   }
+/// }
+/// check_positive(12)
+/// // -> Left(12)
+/// check_positive(-3)
+/// // -> Right("negative number")
+/// ```
+pub type Either(a, b) {
+  Left(a)
+  Right(b)
+}
+
+/// Produces the factorizing function from a `candidate` c with `two injections` i and j to the best coproduct (either). \
+/// Property: i and j can be `reconstructed` from the canonical coproduct e  \
+/// With m = coproduct_factorizer(i, j), we have:
+/// - i(x) = m(Left(x))
+/// - j(x) = m(Right(x))
+/// ### Examples
+/// ```gleam
+/// // Given the candidate #(Int, Bool) with two injections from Int and Bool
+/// let i = fn(x: Int) {#(x, False)}
+/// let j = fn(x: Bool) {#(9, x)}
+/// // We show that Either(Int, Bool) is a better coproduct by finding the mapping m:
+/// let m = coproduct_factorizer(i, j)
+/// m(Left(2))
+/// // -> #(2, True)  
+/// m(Right(False))
+/// // -> #(9, False)  
+/// ```
+pub fn coproduct_factorizer(
+  i: fn(a) -> c,
+  j: fn(b) -> c,
+) -> fn(Either(a, b)) -> c {
+  fn(e) {
+    case e {
+      Left(a) -> i(a)
+      Right(b) -> j(b)
+    }
+  }
+}
+
+/// Converts from `Pair` to gleam `Tuple`.
+/// ### Examples
+/// ```gleam
+/// pair_to_tuple(Pair(2, True))
+/// // -> #(2, True)
+/// ```
+pub fn pair_to_tuple(p: Pair(a, b)) -> #(a, b) {
+  #(p.fst, p.snd)
+}
+
+/// Converts from gleam `Tuple` to `Pair`.
+/// ### Examples
+/// ```gleam
+/// tuple_to_pair(#(2, True))
+/// // -> Pair(2, True)
+/// ```
+pub fn tuple_to_pair(t: #(a, b)) -> Pair(a, b) {
+  Pair(t.0, t.1)
+}
+
+/// `Maybe` type from Haskell (`Option` in gleam).
+/// ```
+/// data Maybe = Nothing | Just a
+/// -- Equivalent: Sum type between `unit` and `a`
+/// type Maybe = Either () a
+/// ```
 /// ### Examples
 /// ```gleam
 /// let safe_div = fn(a, b) {
@@ -133,91 +246,41 @@ pub fn maybe_id(x: a) -> Maybe(a) {
   Just(x)
 }
 
-/// Canonical implementation of a `product` (tuple)
-/// Examples
-/// ```gleam
-/// let even_to_string = fn(x: Int) -> Pair(String, Bool) {
-///   Pair(int.to_string(x), x % 2 == 0)
-/// }
-/// even_to_string(82).fst
-/// // -> "82"
-/// even_to_string(82).snd
-/// // -> True
-/// even_to_string(83).snd
-/// // -> False
-/// ```
-pub type Pair(a, b) {
-  Pair(fst: a, snd: b)
-}
-
-/// Produces the factorizing function from a `candidate` c with `two projections` p and q to the best product (tuple / pair). \
-/// Property: p and q can be `reconstructed` from the canonical product  \
-/// With m = product_factorizer(p, q), we have:
-/// - p(x) = m(x).fst
-/// - q(x) = m(x).snd
+/// Converts from `Maybe` to gleam `Option`.
 /// ### Examples
 /// ```gleam
-/// // Given the candidate Int with two projections to Int and Bool
-/// let p = fn(x: Int) {x}
-/// let q = fn(_: Int) {True}
-/// // We show that Pair(Int, Bool) is a better product by finding the mapping m:
-/// let m = product_factorizer(p, q)
-/// m(7)
-/// // -> Pair(7, True)  
+/// maybe_to_option(Nothing)
+/// // -> None
+/// maybe_to_option(Just(2))
+/// // -> Some(2)
 /// ```
-pub fn product_factorizer(p: fn(c) -> a, q: fn(c) -> b) -> fn(c) -> Pair(a, b) {
-  fn(x) { Pair(fst: p(x), snd: q(x)) }
-}
-
-/// Canonical implementation of a `coproduct` 
-/// ```haskell
-/// data Either a b = Left a | Right b
-/// ```
-/// ### Examples
-/// ```gleam
-/// let check_positive = fn(x: Int) -> Either(Int, String) {
-///   case x >= 0 {
-///     True -> Left(x)
-///     False -> Right("negative number")
-///   }
-/// }
-/// check_positive(12)
-/// // -> Left(12)
-/// check_positive(-3)
-/// // -> Right("negative number")
-/// ```
-pub type Either(a, b) {
-  Left(a)
-  Right(b)
-}
-
-/// Produces the factorizing function from a `candidate` c with `two injections` i and j to the best coproduct (either). \
-/// Property: i and j can be `reconstructed` from the canonical coproduct e  \
-/// With m = coproduct_factorizer(i, j), we have:
-/// - i(x) = m(Left(x))
-/// - j(x) = m(Right(x))
-/// ### Examples
-/// ```gleam
-/// // Given the candidate #(Int, Bool) with two injections from Int and Bool
-/// let i = fn(x: Int) {#(x, False)}
-/// let j = fn(x: Bool) {#(9, x)}
-/// // We show that Either(Int, Bool) is a better coproduct by finding the mapping m:
-/// let m = coproduct_factorizer(i, j)
-/// m(Left(2))
-/// // -> #(2, True)  
-/// m(Right(False))
-/// // -> #(9, False)  
-/// ```
-pub fn coproduct_factorizer(
-  i: fn(a) -> c,
-  j: fn(b) -> c,
-) -> fn(Either(a, b)) -> c {
-  fn(e) {
-    case e {
-      Left(a) -> i(a)
-      Right(b) -> j(b)
-    }
+pub fn maybe_to_option(m: Maybe(a)) -> Option(a) {
+  case m {
+    Nothing -> None
+    Just(x) -> Some(x)
   }
+}
+
+/// Converts from gleam `Option` to `Maybe`.
+/// ### Examples
+/// ```gleam
+/// option_to_maybe(None)
+/// // -> Nothing
+/// option_to_maybe(Some(2))
+/// // -> Just(2)
+/// ```
+pub fn option_to_maybe(o: Option(a)) -> Maybe(a) {
+  case o {
+    None -> Nothing
+    Some(x) -> Just(x)
+  }
+}
+
+pub type List(a) {
+  // Nil is taken by gleam (unit type)
+  Null
+  // Recursive type definition
+  Cons(List(a))
 }
 
 pub fn main() {

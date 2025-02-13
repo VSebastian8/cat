@@ -15,13 +15,16 @@ import category_theory/monoid as mono
 
 pub fn main() {
    let either_sum_monoid =
-    mono.Monoid(mempty: Left(0), mappend: fn(e1: Either(Int, String), e2: Either(Int, String)) -> Either(Int, String) {
-      case e1, e2 {
-        Right(s), _ -> Right(s)
-        _, Right(s) -> Right(s)
-        Left(a), Left(b) -> Left(a + b)
+    mono.Monoid(
+      mempty: Left(0),
+      mappend: fn(e1: Either(Int, String), e2: Either(Int, String)) -> Either(Int, String) {
+        case e1, e2 {
+          Right(s), _ -> Right(s)
+          _, Right(s) -> Right(s)
+          Left(a), Left(b) -> Left(a + b)
+        }
       }
-    })
+    )
 
   either_sum_monoid
   |> mono.mconcat([Left(2), Left(3), Left(4)])

@@ -3,7 +3,7 @@
 //// Finally, this module contains several instances for the monoid type.
 
 /// A monoid is a `set` with a `binary operation` or a a `single object category` with a `set of morphisms` that follow the rules of composition.
-/// ```haskell
+/// ```
 /// class Monoid m where
 ///   mempty  :: m
 ///   mappend :: m -> m -> m

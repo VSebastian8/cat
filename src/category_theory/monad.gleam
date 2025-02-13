@@ -14,7 +14,7 @@ pub type Writer(a) {
 }
 
 /// `Composition` for the embellished functions that return the Writer type.
-/// ```haskell
+/// ```
 /// (>=>) :: (a -> Writer b) -> (b -> Writer c) -> (a -> Writer c)
 /// m1 >=> m2 = \x -> 
 ///   let (y, s1) = m1 x

@@ -1,18 +1,10 @@
 name = "category_theory"
 version = "1.0.0"
-authors = ["VSebastian8 <https://github.com/VSebastian8>"]
-description = "Category theory concepts in gleam. "
 
-# Fill out these fields if you intend to generate HTML documentation or publish
-# your project to the Hex package manager.
-#
-# description = ""
-# licences = ["Apache-2.0"]
-# repository = { type = "github", user = "", repo = "" }
-# links = [{ title = "Website", href = "" }]
-#
-# For a full reference of all the available options, you can have a look at
-# https://gleam.run/writing-gleam/gleam-toml/.
+authors = ["VSebastian8"]
+description = "Category theory concepts in gleam."
+licences = ["Apache-2.0"]
+repository = { type = "github", user = "VSebastian8", repo = "Category-Theory" }
 
 [dependencies]
 gleam_stdlib = ">= 0.44.0 and < 2.0.0"
