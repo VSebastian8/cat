@@ -1,12 +1,9 @@
 import category_theory/monoid as mono
-import gleam/bool
-import gleam/io
 import gleam/option
 import gleeunit/should
 
+/// Testing the Monoid type: mempty, mappend and mconcat.
 pub fn monoid_type_test() {
-  io.debug("Testing the monoid type")
-
   let int_sum_monoid =
     mono.Monoid(mempty: 0, mappend: fn(x: Int, y: Int) { x + y })
 
@@ -23,8 +20,17 @@ pub fn monoid_type_test() {
   |> mono.mconcat([2, 3, int_prod_monoid.mempty, 4, int_prod_monoid.mempty])
   |> int_prod_monoid.mappend(10)
   |> should.equal(240)
+}
 
-  let bool_and_monoid = mono.Monoid(mempty: True, mappend: bool.and)
+/// Testing the unit monoid.
+pub fn monoid_unit_test() {
+  mono.unit_monoid().mappend(mono.unit_monoid().mempty, Nil)
+  |> should.equal(Nil)
+}
+
+/// Testing the (Bool, &&) monoid.
+pub fn monoid_all_test() {
+  let bool_and_monoid = mono.all_monoid()
 
   True
   |> bool_and_monoid.mappend(False)
@@ -32,25 +38,34 @@ pub fn monoid_type_test() {
   |> should.equal(False)
 }
 
-pub fn monoid_instances_test() {
-  io.debug("Testing the monoid instances")
+/// Testing the (Bool, ||) monoid.
+pub fn monoid_any_test() {
+  let bool_or_monoid = mono.any_monoid()
 
-  let mono_unit = mono.unit_monoid()
+  False
+  |> bool_or_monoid.mappend(False)
+  |> bool_or_monoid.mappend(bool_or_monoid.mempty)
+  |> should.equal(False)
+}
+
+/// Testing the list monoid.
+pub fn monoid_list_test() {
   let mono_list = mono.list_monoid()
-  let mono_string =
-    mono.Monoid(mempty: "", mappend: fn(x: String, y: String) -> String {
-      x <> y
-    })
-  let mono_maybe = mono.option_monoid(mono_string)
-
-  mono_unit.mappend(mono_unit.mempty, Nil)
-  |> should.equal(Nil)
 
   [1, 2]
   |> mono_list.mappend([3, 4, 5])
   |> mono_list.mappend(mono_list.mempty)
   |> mono_list.mappend([6])
   |> should.equal([1, 2, 3, 4, 5, 6])
+}
+
+/// Testing the option monoid.
+pub fn monoid_option_test() {
+  let mono_string =
+    mono.Monoid(mempty: "", mappend: fn(x: String, y: String) -> String {
+      x <> y
+    })
+  let mono_maybe = mono.option_monoid(mono_string)
 
   option.Some("ab")
   |> mono_maybe.mappend(option.Some("cd"))
@@ -58,4 +73,17 @@ pub fn monoid_instances_test() {
 
   mono_maybe.mappend(option.Some("abc"), mono_maybe.mempty)
   |> should.equal(option.None)
+}
+
+/// Testing the tuple monoid.
+pub fn monoid_tuple_test() {
+  let mono_bool = mono.all_monoid()
+  let mono_list = mono.list_monoid()
+
+  let mono_all_list = mono.tuple_monoid(mono_bool, mono_list)
+  #(True, [1, 2])
+  |> mono_all_list.mappend(#(True, [3]))
+  |> mono_all_list.mappend(mono_all_list.mempty)
+  |> mono_all_list.mappend(#(False, []))
+  |> should.equal(#(False, [1, 2, 3]))
 }

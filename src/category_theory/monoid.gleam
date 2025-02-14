@@ -2,6 +2,10 @@
 //// We also define the `mconcat` function in terms of mempty and mappend. \
 //// Finally, this module contains several instances for the monoid type.
 
+import gleam/bool
+import gleam/list
+import gleam/option.{type Option, None, Some}
+
 /// A monoid is a `set` with a `binary operation` or a a `single object category` with a `set of morphisms` that follow the rules of composition.
 /// ```
 /// class Monoid m where
@@ -36,12 +40,10 @@ pub fn mconcat(mono: Monoid(m), monoid_list: List(m)) -> m {
   monoid_list |> list.fold(mono.mempty, mono.mappend)
 }
 
-import gleam/list
-import gleam/option.{type Option, None, Some}
-
 /// Returns the `canonical implementation` of the `monoid type for Nil` (unit type).
 /// ### Examples
 /// ```gleam
+/// let mono_unit = unit_monoid()
 /// mono_unit.mappend(mono_unit.mempty, Nil)
 /// // -> Nil
 /// ```
@@ -49,9 +51,36 @@ pub fn unit_monoid() -> Monoid(Nil) {
   Monoid(mempty: Nil, mappend: fn(_, _) { Nil })
 }
 
+/// Monoid instance for Bool with (&&).
+/// ### Examples
+/// ```gleam
+/// let bool_and_monoid = all_monoid()
+/// True
+/// |> bool_and_monoid.mappend(False)
+/// |> bool_and_monoid.mappend(bool_and_monoid.mempty)
+/// // -> False
+/// ```
+pub fn all_monoid() {
+  Monoid(mempty: True, mappend: bool.and)
+}
+
+/// Monoid instance for Bool with (||).
+/// ### Examples
+/// ```gleam
+/// let bool_or_monoid = any_monoid()
+/// False
+/// |> bool_or_monoid.mappend(False)
+/// |> bool_or_monoid.mappend(bool_or_monoid.mempty)
+/// // -> False
+/// ```
+pub fn any_monoid() {
+  Monoid(mempty: False, mappend: bool.or)
+}
+
 /// Returns the `canonical implementation` of the `monoid type for List`.
 /// ### Examples
 /// ```gleam
+/// let mono_list = list_monoid()
 /// [1, 2]
 /// |> mono_list.mappend([3, 4, 5])
 /// |> mono_list.mappend(mono_list.mempty)

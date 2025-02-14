@@ -133,7 +133,7 @@ pub type Either(a, b) {
 /// ### Examples
 /// ```gleam
 /// // Given the candidate #(Int, Bool) with two injections from Int and Bool
-/// let i = fn(x: Int) {#(x, False)}
+/// let i = fn(x: Int) {#(x, True)}
 /// let j = fn(x: Bool) {#(9, x)}
 /// // We show that Either(Int, Bool) is a better coproduct by finding the mapping m:
 /// let m = coproduct_factorizer(i, j)
