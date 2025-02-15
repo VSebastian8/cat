@@ -9,9 +9,12 @@ This package implements several category theory concepts, following [this book](
 gleam add cat
 ```
 
+Monoid Example
+
 ```gleam
 import cat.{type Either, Left, Right}
 import cat/monoid as mono
+
 
 pub fn main() {
    let either_sum_monoid =
@@ -35,6 +38,23 @@ pub fn main() {
   |> mono.mconcat([Left(2), Right("error"), Left(4)])
   |> io.debug()
   // -> Right("error")
+}
+```
+
+Functor Example
+
+```gleam
+import cat/functor as fun
+import gleam/option
+
+pub fn main() {
+
+  option.Some([1, 2, 3])
+  |> fun.functor_compose(fun.list_functor(), fun.option_functor())(fn(x) {
+    x % 2 == 0
+  })
+  |> io.debug()
+  // -> option.Some([True, False, True])
 }
 ```
 

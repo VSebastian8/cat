@@ -7,13 +7,17 @@ import gleam/option.{type Option, None, Some}
 /// class Functor f where
 ///     fmap :: (a -> b) -> f a -> f b
 /// ```
+/// ### Functor laws
+/// - Preservation of `identity`: **fmap id = id**
+/// - Preservation of `composition`: **fmap (g . h) = (fmap g) . (fmap h)**
+/// 
 /// Since gleam does not have `Higher Kinded Types`, we cannot pass the type constructor to the Functor type. \
 /// We would like pass Option as f and then use f(a) as a type in the fmap definition.
 /// ### Compromise
 /// The user will follow this **convention**:
 /// - f: the first parameter of the Functor type is a `phantom type` used to differentiate between Functor instances
 /// - a, b: the second and third parameters are `generic types`
-/// - c, d: the fourth and fifth parameters are the `constructed types` **f(a)** and **f(b)** respectively
+/// - fa, fb: the fourth and fifth parameters are the `constructed types` **f(a)** and **f(b)** respectively
 /// ### Examples 
 /// ```gleam
 /// // The type that will be an instance of Functor:
@@ -40,8 +44,24 @@ import gleam/option.{type Option, None, Some}
 /// identity_functor().fmap(g)(Identity(6.0))
 /// // -> Identity("6.0")
 /// ```
-pub type Functor(f, a, b, c, d) {
-  Functor(fmap: fn(fn(a) -> b) -> fn(c) -> d)
+pub type Functor(f, a, b, fa, fb) {
+  Functor(fmap: fn(fn(a) -> b) -> fn(fa) -> fb)
+}
+
+/// Functor `composition`. \
+/// Is simply the composition of their fmaps.
+/// ### Examples
+/// ```gleam
+/// Some([1, 2, 3])
+/// |> functor_compose(list_functor(), option_functor())
+/// ( fn(x) { int.to_string(x + 1) } )
+/// // -> Some(["2", "3", "4"])
+/// ```
+pub fn functor_compose(
+  g: Functor(_, a, b, ga, gb),
+  f: Functor(_, ga, gb, fga, fgb),
+) {
+  cat.compose(f.fmap, g.fmap)
 }
 
 /// Phantom type for `Option Functor`.
