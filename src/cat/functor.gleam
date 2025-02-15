@@ -1,4 +1,5 @@
 //// `Functor` type {minimal implementation - `fmap`}. \
+//// Default implementation for: `replace` (<$ operator). \
 //// Functor composition and various functor instances: Option, List, Reader, Const, Tuple, Triple, Pair, Either.
 
 import cat.{type Const, type Either, type Pair, Const, Left, Pair, Right}
@@ -49,6 +50,22 @@ import gleam/option.{type Option, None, Some}
 /// ```
 pub type Functor(f, a, b, fa, fb) {
   Functor(fmap: fn(fn(a) -> b) -> fn(fa) -> fb)
+}
+
+/// Haskell (<$) operator.
+/// ```
+/// (<$) :: a -> f b -> f a
+/// x <$ m = fmap (const x) m 
+/// ```
+/// ### Examples
+/// ```gleam
+/// replace(option_functor())("a", Some(2))
+/// // -> Some("a")
+/// replace(option_functor())("a", None)
+/// // -> None
+/// ```
+pub fn replace(functor: Functor(_, _, a, fb, fa)) -> fn(a, fb) -> fa {
+  fn(x, m) { functor.fmap(fn(_) { x })(m) }
 }
 
 /// Functor `composition`. \

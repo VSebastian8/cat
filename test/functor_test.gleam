@@ -45,6 +45,32 @@ pub fn functor_test() {
   |> should.equal(Identity("6.0"))
 }
 
+/// Testing the replace function.
+pub fn replace_test() {
+  fun.replace(fun.option_functor())("a", option.Some(2))
+  |> should.equal(option.Some("a"))
+
+  fun.replace(fun.option_functor())("a", option.None)
+  |> should.equal(option.None)
+}
+
+/// Testing the identity and composition preservation.
+pub fn functor_laws_test() {
+  list.map(list.range(0, 100), fn(i) {
+    fun.option_functor().fmap(cat.id)(option.Some(i))
+    |> should.equal(option.Some(i))
+  })
+  let f = fn(x) { x * 5 }
+  let g = fn(x) { x % 2 == 0 }
+
+  list.map(list.range(0, 100), fn(i) {
+    let first = fun.option_functor().fmap(cat.compose(g, f))
+    let second =
+      cat.compose(fun.option_functor().fmap(g), fun.option_functor().fmap(f))
+    should.equal(first(option.Some(i)), second(option.Some(i)))
+  })
+}
+
 /// Testing the option functor instance.
 pub fn option_functor_test() {
   let double = fn(x) { x * 2 }
@@ -85,23 +111,6 @@ pub fn functor_compose_test() {
     int.to_string(x + 1)
   })
   |> should.equal(option.Some(["2", "3", "4"]))
-}
-
-/// Testing the identity and composition preservation.
-pub fn functor_laws_test() {
-  list.map(list.range(0, 100), fn(i) {
-    fun.option_functor().fmap(cat.id)(option.Some(i))
-    |> should.equal(option.Some(i))
-  })
-  let f = fn(x) { x * 5 }
-  let g = fn(x) { x % 2 == 0 }
-
-  list.map(list.range(0, 100), fn(i) {
-    let first = fun.option_functor().fmap(cat.compose(g, f))
-    let second =
-      cat.compose(fun.option_functor().fmap(g), fun.option_functor().fmap(f))
-    should.equal(first(option.Some(i)), second(option.Some(i)))
-  })
 }
 
 /// Testing the tuple functor instance.
