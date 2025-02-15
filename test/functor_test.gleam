@@ -9,40 +9,35 @@ import gleam/list
 import gleam/option
 import gleeunit/should
 
-/// The type that will be an instance of Functor:
-type Identity(a) {
-  Identity(a)
-}
-
 /// The phantom type that will be the first parameter:
 type IdentityF
 
 pub fn functor_test() {
   // Instance of Identity for Functor:
-  let identity_functor = fn() -> fun.Functor(
+  let id_f = fn() -> fun.Functor(
     IdentityF,
     a,
     b,
-    Identity(a),
-    Identity(b),
+    cat.Identity(a),
+    cat.Identity(b),
   ) {
     fun.Functor(fmap: fn(f) {
       fn(idx) {
-        let Identity(x) = idx
-        Identity(f(x))
+        let cat.Identity(x) = idx
+        cat.Identity(f(x))
       }
     })
   }
 
   let f = fn(x: Int) -> Bool { x % 2 == 0 }
 
-  identity_functor().fmap(f)(Identity(5))
-  |> should.equal(Identity(False))
+  id_f().fmap(f)(cat.Identity(5))
+  |> should.equal(cat.Identity(False))
 
   let g = fn(x: Float) -> String { float.to_string(x) }
 
-  identity_functor().fmap(g)(Identity(6.0))
-  |> should.equal(Identity("6.0"))
+  id_f().fmap(g)(cat.Identity(6.0))
+  |> should.equal(cat.Identity("6.0"))
 }
 
 /// Testing the replace function.

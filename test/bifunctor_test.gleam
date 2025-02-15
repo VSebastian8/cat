@@ -2,6 +2,7 @@
 
 import cat
 import cat/bifunctor as bif
+import cat/functor as fun
 import gleam/bool
 import gleam/int
 import gleeunit/should
@@ -58,4 +59,39 @@ pub fn either_bifunctor_test() {
   cat.Right(10)
   |> show_or_double()
   |> should.equal(cat.Right(20))
+}
+
+/// Testing the compose of a bifunctor with 2 functors.
+pub fn bifunctor_compose_test() {
+  // Either bifunctor
+  let either_bf = bif.either_bifunctor()
+  // Const () functor
+  let const_f = fun.const_functor()
+  // Identity functor
+  let id_f = fun.identity_functor()
+
+  // Constructing the maybe functor:
+  // Maybe b = Either (Const () a) (Idenity b)
+  let maybe_functor = fn() -> bif.Bifunctor(
+    bif.BiCompF(bif.EitherBF, fun.ConstF(Nil), fun.IdentityF),
+    a,
+    b,
+    c,
+    d,
+    cat.Either(cat.Const(Nil, a), cat.Identity(b)),
+    cat.Either(cat.Const(Nil, c), cat.Identity(d)),
+  ) {
+    bif.bifunctor_compose(either_bf, const_f, id_f)
+  }
+  // bimap is equivalent to fmap:
+  // fmap :: (b -> d) -> Maybe b -> Maybe d
+  // fmap g (Left Const ()) = Left Const ()
+  // fmap h (Right Identity y) = Right Identity (h y)
+  cat.Left(cat.Const(Nil))
+  |> maybe_functor().bimap(fn(_) { panic }, int.to_string)
+  |> should.equal(cat.Left(cat.Const(Nil)))
+
+  cat.Right(cat.Identity(3))
+  |> maybe_functor().bimap(fn(_) { panic }, int.to_string)
+  |> should.equal(cat.Right(cat.Identity("3")))
 }

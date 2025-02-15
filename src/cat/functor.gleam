@@ -2,7 +2,10 @@
 //// Default implementation for: `replace` (<$ operator). \
 //// Functor composition and various functor instances: Option, List, Reader, Const, Tuple, Triple, Pair, Either.
 
-import cat.{type Const, type Either, type Pair, Const, Left, Pair, Right}
+import cat.{
+  type Const, type Either, type Identity, type Pair, Const, Identity, Left, Pair,
+  Right,
+}
 import gleam/option.{type Option, None, Some}
 
 /// `Functor` type in gleam.
@@ -82,6 +85,31 @@ pub fn functor_compose(
   f: Functor(_, ga, gb, fga, fgb),
 ) {
   cat.compose(f.fmap, g.fmap)
+}
+
+// Phantom type for `Identity Functor`.
+pub type IdentityF
+
+/// `Identity Functor Instance`.
+/// ```
+/// // Haskell instance
+/// instance Functor Maybe where
+///     fmap :: (a -> b) -> Identity a -> Identity b
+///     fmap f (Identity x) = Identity(f x)
+/// ```
+/// ### Examples
+/// ```gleam
+/// let f = fn(x: Int) -> Bool { x % 2 == 0 }
+/// identity_functor().fmap(f)(Identity(5))
+/// // -> Identity(False)
+/// ```
+pub fn identity_functor() -> Functor(IdentityF, a, b, Identity(a), Identity(b)) {
+  Functor(fmap: fn(f) {
+    fn(idx) {
+      let Identity(x) = idx
+      Identity(f(x))
+    }
+  })
 }
 
 /// Phantom type for `Option Functor`.

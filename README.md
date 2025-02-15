@@ -58,6 +58,45 @@ pub fn main() {
 }
 ```
 
+Bifunctor Example
+
+```gleam
+import cat
+import cat/functor as fun
+import cat/bifunctor as bf
+import gleam/option
+
+pub fn main() {
+  // Either bifunctor
+  let either_bf = bif.either_bifunctor()
+  // Const () functor
+  let const_f = fun.const_functor()
+  // Identity functor
+  let id_f = fun.identity_functor()
+
+  // Constructing the maybe functor:
+  // Maybe b = Either (Const () a) (Idenity b)
+  let maybe_functor = fn() -> bif.Bifunctor(
+    bif.BiCompF(bif.EitherBF, fun.ConstF(Nil), fun.IdentityF),
+    a, b, c, d,
+    cat.Either(cat.Const(Nil, a), cat.Identity(b)),
+    cat.Either(cat.Const(Nil, c), cat.Identity(d)),
+  ) {
+    bif.bifunctor_compose(either_bf, const_f, id_f)
+  }
+
+  cat.Left(cat.Const(Nil))
+  |> maybe_functor().bimap(fn(_) { panic }, int.to_string)
+  |> io.debug
+  // -> cat.Left(cat.Const(Nil))
+
+  cat.Right(cat.Identity(3))
+  |> maybe_functor().bimap(fn(_) { panic }, int.to_string)
+  |> io.debug
+  // -> should.equal(cat.Right(cat.Identity("3")))
+}
+```
+
 Further documentation can be found at <https://hexdocs.pm/cat>.
 
 ## Development

@@ -1,7 +1,9 @@
 //// `Bifunctor` type {minimal implementation - `bimap`}. \
-//// Default functions: `first` and `second` (defined in terms of bimap).
+//// Default functions: `first` and `second` (defined in terms of bimap). \
+//// Bifunctor `composition`.
 
 import cat.{type Either, type Pair, Left, Pair, Right}
+import cat/functor.{type Functor, Functor}
 
 /// `Bifunctor` type in gleam.
 /// ```
@@ -118,6 +120,46 @@ pub fn either_bifunctor() -> Bifunctor(
         Left(x) -> Left(g(x))
         Right(y) -> Right(h(y))
       }
+    }
+  })
+}
+
+/// Bifunctor composition type. 
+/// ```
+/// newtype BiComp bf fu gu a b = BiComp (bf (fu a ) (gu b))
+/// ```
+pub type BiComp(bf, fu, gu, a, b, fua, gub, bifgab) {
+  // fua = fu(a)
+  // gub = gu(b)
+  // bifgab = bf(fua, gub)
+  BiComp(bifgab)
+}
+
+/// Phantom type for bifunctor composition.
+pub type BiCompF(bf, fu, gu)
+
+/// Composition of a `Bifunctor` with `2 Functors`.
+/// ```
+/// // Haskell instance
+/// instance (Bifunctor bf, Functor fu, Functor gu) =>
+///     Bifunctor (BiComp bf fu gu) where
+///         bimap f1 f2 (BiComp x) = BiComp ((bimap (fmap f1) (fmap f2)) x)
+/// ```
+/// ### Examples
+/// ```gleam
+/// Right(Identity(3))
+/// |> bifunctor_compose(either_bifunctor(), const_functor(), identity_functor())
+///   .bimap(fn(_) { panic }, fn(x) { x % 2 == 0 })
+/// // -> Right(Identity(False))
+/// ```
+pub fn bifunctor_compose(
+  bf_instance: Bifunctor(bf, fua, gub, fuc, gud, bifgab, bifgcd),
+  fu_instance: Functor(fu, a, c, fua, fuc),
+  gu_instance: Functor(gu, b, d, gub, gud),
+) -> Bifunctor(BiCompF(bf, fu, gu), a, b, c, d, bifgab, bifgcd) {
+  Bifunctor(bimap: fn(f1: fn(a) -> c, f2: fn(b) -> d) {
+    fn(x: bifgab) -> bifgcd {
+      bf_instance.bimap(fu_instance.fmap(f1), gu_instance.fmap(f2))(x)
     }
   })
 }

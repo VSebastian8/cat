@@ -1,4 +1,4 @@
-//// `Basic category concepts`: composition, identity, Void, 0unit, option (Maybe), product (Pair), coproduct (Either).
+//// `Basic category concepts`: composition, identity, Void, unit, option (Maybe), product (Pair), coproduct (Either), Identity, and Const.
 
 import gleam/io
 import gleam/option.{type Option, None, Some}
@@ -283,12 +283,30 @@ pub type List(a) {
   Cons(List(a))
 }
 
+/// `Identity` type from Haskell
+/// ```
+/// newtype Identity a = Identity a
+/// ```
+/// ### Examples
+/// ```gleam
+/// Identity(8)
+/// Identity("abc")
+/// ```
+pub type Identity(a) {
+  Identity(a)
+}
+
 /// `Const` type from Haskell.
 /// ```
 /// data Const c a = Const c
 /// ```
 /// Only the first parameter affects the type, the second is ignore. \
 /// In gleam, we say that `a` is a `phantom type`.
+/// ### Examples
+/// ```gleam
+/// let x: Const(Int, Bool) = Const(7)
+/// let y: Const(String, String) = Const("abc")
+/// ```
 pub type Const(c, a) {
   Const(c)
 }
