@@ -177,7 +177,7 @@ pub fn tuple_to_pair(t: #(a, b)) -> Pair(a, b) {
 /// `Maybe` type from Haskell (`Option` in gleam).
 /// ```
 /// data Maybe = Nothing | Just a
-/// -- Equivalent: Sum type between `unit` and `a`
+/// // Equivalent: Sum type between `unit` and `a`
 /// type Maybe = Either () a
 /// ```
 /// ### Examples
