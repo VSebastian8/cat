@@ -1,10 +1,10 @@
-name = "category_theory"
-version = "1.0.0"
+name = "cat"
+version = "0.1.0"
 
 authors = ["VSebastian8"]
-description = "Category theory concepts in gleam."
+description = "Category Theory concepts in Gleam!"
 licences = ["Apache-2.0"]
-repository = { type = "github", user = "VSebastian8", repo = "Category-Theory" }
+repository = { type = "github", user = "VSebastian8", repo = "cat" }
 
 [dependencies]
 gleam_stdlib = ">= 0.44.0 and < 2.0.0"

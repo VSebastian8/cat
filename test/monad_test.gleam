@@ -1,4 +1,4 @@
-import category_theory/monad.{Writer, fish, return}
+import cat/monad.{Writer, fish, return}
 import gleam/string
 import gleeunit/should
 

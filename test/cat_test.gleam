@@ -1,4 +1,4 @@
-import category_theory as ct
+import cat
 import gleam/int
 import gleam/list
 import gleam/option
@@ -9,30 +9,15 @@ pub fn main() {
   gleeunit.main()
 }
 
-/// Useful function for testing, generating a list that starts from the first parameter and ends at the second.
-/// ### Examples
-/// ```gleam
-/// range(0, 3)
-/// // -> [0, 1, 2, 3]
-/// range(5, 9)
-/// // -> [5, 6, 7, 8, 9]
-/// ```
-fn range(start: Int, finish: Int) -> List(Int) {
-  case finish - start {
-    0 -> [start]
-    _ -> [start, ..range(start + 1, finish)]
-  }
-}
-
 /// Testing the identity function.
 pub fn identity_test() {
-  ct.id(2)
+  cat.id(2)
   |> should.equal(2)
 
-  ct.id("abc")
+  cat.id("abc")
   |> should.equal("abc")
 
-  ct.id(True)
+  cat.id(True)
   |> should.equal(True)
 }
 
@@ -40,7 +25,7 @@ pub fn identity_test() {
 pub fn composition_test() {
   let y = fn(x: Int) { int.to_string(x) }
   let z = fn(s: String) { s == "28" }
-  let h = ct.compose(z, y)
+  let h = cat.compose(z, y)
 
   h(28)
   |> should.equal(True)
@@ -53,23 +38,23 @@ pub fn composition_test() {
 pub fn composition_rules_test() {
   let f = fn(x: Int) { x * 5 }
 
-  list.map(range(0, 100), fn(i) {
-    ct.compose(ct.id, f)(i)
+  list.map(list.range(0, 100), fn(i) {
+    cat.compose(cat.id, f)(i)
     |> should.equal(f(i))
   })
 
-  list.map(range(0, 100), fn(i) {
-    ct.compose(f, ct.id)(i)
+  list.map(list.range(0, 100), fn(i) {
+    cat.compose(f, cat.id)(i)
     |> should.equal(f(i))
   })
 }
 
 /// Testig unit function.
 pub fn unit_function_test() {
-  ct.unit(5)
+  cat.unit(5)
   |> should.equal(Nil)
 
-  ct.unit("abc")
+  cat.unit("abc")
   |> should.equal(Nil)
 }
 
@@ -77,42 +62,42 @@ pub fn unit_function_test() {
 pub fn factorizers_test() {
   let p = fn(x: Int) { x }
   let q = fn(_: Int) { True }
-  let m = ct.product_factorizer(p, q)
+  let m = cat.product_factorizer(p, q)
 
   m(7)
-  |> should.equal(ct.Pair(7, True))
+  |> should.equal(cat.Pair(7, True))
 
   let i = fn(x: Int) { #(x, True) }
   let j = fn(x: Bool) { #(9, x) }
-  let m = ct.coproduct_factorizer(i, j)
+  let m = cat.coproduct_factorizer(i, j)
 
-  m(ct.Left(2))
+  m(cat.Left(2))
   |> should.equal(#(2, True))
 
-  m(ct.Right(False))
+  m(cat.Right(False))
   |> should.equal(#(9, False))
 }
 
 /// Testing pair_to_tuple and tuple_to_pair.
 pub fn pair_test() {
-  ct.pair_to_tuple(ct.Pair(7, 8))
+  cat.pair_to_tuple(cat.Pair(7, 8))
   |> should.equal(#(7, 8))
 
-  ct.tuple_to_pair(#([1, 2, 3], "abc"))
-  |> should.equal(ct.Pair([1, 2, 3], "abc"))
+  cat.tuple_to_pair(#([1, 2, 3], "abc"))
+  |> should.equal(cat.Pair([1, 2, 3], "abc"))
 }
 
 /// Testing maybe_to_option and option_to_maybe.
 pub fn maybe_test() {
-  ct.maybe_to_option(ct.Nothing)
+  cat.maybe_to_option(cat.Nothing)
   |> should.equal(option.None)
 
-  ct.maybe_to_option(ct.Just(8))
+  cat.maybe_to_option(cat.Just(8))
   |> should.equal(option.Some(8))
 
-  ct.option_to_maybe(option.None)
-  |> should.equal(ct.Nothing)
+  cat.option_to_maybe(option.None)
+  |> should.equal(cat.Nothing)
 
-  ct.option_to_maybe(option.Some("a"))
-  |> should.equal(ct.Just("a"))
+  cat.option_to_maybe(option.Some("a"))
+  |> should.equal(cat.Just("a"))
 }

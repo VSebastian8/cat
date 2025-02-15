@@ -1,4 +1,4 @@
-import category_theory/monoid as mono
+import cat/monoid as mono
 import gleam/option
 import gleeunit/should
 

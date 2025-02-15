@@ -1,17 +1,17 @@
-# category_theory
+# Category Theory
 
-[![Package Version](https://img.shields.io/hexpm/v/category_theory)](https://hex.pm/packages/category_theory)
-[![Hex Docs](https://img.shields.io/badge/hex-docs-ffaff3)](https://hexdocs.pm/category_theory/)
+[![Package Version](https://img.shields.io/hexpm/v/cat)](https://hex.pm/packages/cat)
+[![Hex Docs](https://img.shields.io/badge/hex-docs-ffaff3)](https://hexdocs.pm/cat)
 
 This package implements several category theory concepts, following [this book](https://bartoszmilewski.com/2014/10/28/category-theory-for-programmers-the-preface/) by Bartosz Milewski.
 
 ```sh
-gleam add category_theory@1
+gleam add cat
 ```
 
 ```gleam
-import category_theory.{Either, Left, Right}
-import category_theory/monoid as mono
+import cat.{type Either, Left, Right}
+import cat/monoid as mono
 
 pub fn main() {
    let either_sum_monoid =
@@ -38,7 +38,7 @@ pub fn main() {
 }
 ```
 
-Further documentation can be found at <https://hexdocs.pm/category_theory>.
+Further documentation can be found at <https://hexdocs.pm/cat>.
 
 ## Development
 

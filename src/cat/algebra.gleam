@@ -1,7 +1,7 @@
 //// This module contains various isomorphisms (morphisms that are invertible).
 //// Algebra on Types (Void = 0, Nil = 1, Bool = 2, Either(a, b) = a + b, Pair(a, b) = a * b, Maybe(a) = 1 + a)
 
-import category_theory.{
+import cat.{
   type Either, type Maybe, type Pair, type Void, Just, Left, Nothing, Pair,
   Right,
 }
