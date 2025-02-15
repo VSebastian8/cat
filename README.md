@@ -31,12 +31,12 @@ pub fn main() {
 
   either_sum_monoid
   |> mono.mconcat([Left(2), Left(3), Left(4)])
-  |> io.debug()
+  |> io.debug
   // -> Left(9)
 
   either_sum_monoid
   |> mono.mconcat([Left(2), Right("error"), Left(4)])
-  |> io.debug()
+  |> io.debug
   // -> Right("error")
 }
 ```
@@ -53,7 +53,7 @@ pub fn main() {
   |> fun.functor_compose(fun.list_functor(), fun.option_functor())(fn(x) {
     x % 2 == 0
   })
-  |> io.debug()
+  |> io.debug
   // -> option.Some([True, False, True])
 }
 ```

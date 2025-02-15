@@ -150,6 +150,14 @@ pub type ReaderF(r)
 ///     fmap :: (a -> b) -> (r -> a) -> (r -> b)
 ///     fmap f g = f . g
 /// ```
+/// ### Examples
+/// ```gleam
+/// let f = fn(x) { x % 2 == 0 }
+/// let g = bool.to_string
+/// 
+/// reader_functor().fmap(g)(f)(19)
+/// // -> "False"
+/// ```
 pub fn reader_functor() -> Functor(ReaderF(r), a, b, fn(r) -> a, fn(r) -> b) {
   Functor(fmap: fn(f: fn(a) -> b) -> fn(fn(r) -> a) -> fn(r) -> b {
     fn(g: fn(r) -> a) -> fn(r) -> b { cat.compose(f, g) }
@@ -215,6 +223,10 @@ pub type EitherF(a)
 /// `Either Functor`
 /// ### Examples
 /// ```gleam
+/// either_functor().fmap(bool.negate)(Left(27))
+/// // -> Left(27)
+/// either_functor().fmap(bool.negate)(Right(False))
+/// // -> Right(True)
 /// ```
 pub fn either_functor() -> Functor(EitherF(a), b, c, Either(a, b), Either(a, c)) {
   Functor(fmap: fn(f: fn(b) -> c) -> fn(Either(a, b)) -> Either(a, c) {
