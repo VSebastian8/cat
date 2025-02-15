@@ -1,6 +1,6 @@
 //// Test module for cat/algebra.gleam
 
-import cat.{Just, Left, Nothing, Pair, Right}
+import cat.{Const, Identity, Just, Left, Nothing, Pair, Right}
 import cat/algebra as alg
 import gleeunit/should
 
@@ -89,4 +89,23 @@ pub fn equations_test() {
 
   alg.delta_inv(Pair(True, [1, 2]))
   |> should.equal(Right([1, 2]))
+}
+
+/// Testing the gamma isomorphism.
+pub fn maybe_adt_test() {
+  Nothing
+  |> alg.gamma
+  |> should.equal(Left(Const(Nil)))
+
+  Just(7)
+  |> alg.gamma
+  |> should.equal(Right(Identity(7)))
+
+  Left(Const(Nil))
+  |> alg.gamma_inv
+  |> should.equal(Nothing)
+
+  Right(Identity(2))
+  |> alg.gamma_inv
+  |> should.equal(Just(2))
 }

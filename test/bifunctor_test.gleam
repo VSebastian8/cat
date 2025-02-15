@@ -71,7 +71,7 @@ pub fn bifunctor_compose_test() {
   let id_f = fun.identity_functor()
 
   // Constructing the maybe functor:
-  // Maybe b = Either (Const () a) (Idenity b)
+  // Maybe b = Either (Const () a) (Identity b)
   let maybe_functor = fn() -> bif.Bifunctor(
     bif.BiCompF(bif.EitherBF, fun.ConstF(Nil), fun.IdentityF),
     a,

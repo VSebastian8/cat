@@ -75,7 +75,7 @@ pub fn main() {
   let id_f = fun.identity_functor()
 
   // Constructing the maybe functor:
-  // Maybe b = Either (Const () a) (Idenity b)
+  // Maybe b = Either (Const () a) (Identity b)
   let maybe_functor = fn() -> bif.Bifunctor(
     bif.BiCompF(bif.EitherBF, fun.ConstF(Nil), fun.IdentityF),
     a, b, c, d,
@@ -93,7 +93,7 @@ pub fn main() {
   cat.Right(cat.Identity(3))
   |> maybe_functor().bimap(fn(_) { panic }, int.to_string)
   |> io.debug
-  // -> should.equal(cat.Right(cat.Identity("3")))
+  // -> cat.Right(cat.Identity("3"))
 }
 ```
 

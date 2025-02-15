@@ -2,8 +2,8 @@
 //// Algebra on Types (Void = 0, Nil = 1, Bool = 2, Either(a, b) = a + b, Pair(a, b) = a * b, Maybe(a) = 1 + a)
 
 import cat.{
-  type Either, type Maybe, type Pair, type Void, Just, Left, Nothing, Pair,
-  Right,
+  type Const, type Either, type Identity, type Maybe, type Pair, type Void,
+  Const, Identity, Just, Left, Nothing, Pair, Right,
 }
 
 /// Commutativity `up to isomorphism` for Pair. \
@@ -157,5 +157,21 @@ pub fn delta_inv(p: Pair(Bool, a)) -> Either(a, a) {
   case p {
     Pair(False, x) -> Left(x)
     Pair(True, x) -> Right(x)
+  }
+}
+
+/// Morphism from `Maybe b` to `Either (Const () a) (Identity b)`.
+pub fn gamma(m: Maybe(b)) -> Either(Const(Nil, a), Identity(b)) {
+  case m {
+    Nothing -> Left(Const(Nil))
+    Just(x) -> Right(Identity(x))
+  }
+}
+
+/// Inverse morphism from `Either (Const () a) (Idenity b)` to `Maybe b`.
+pub fn gamma_inv(e: Either(Const(Nil, a), Identity(b))) -> Maybe(b) {
+  case e {
+    Left(_) -> Nothing
+    Right(Identity(x)) -> Just(x)
   }
 }
