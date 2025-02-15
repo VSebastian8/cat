@@ -42,17 +42,10 @@ pub fn functor_test() {
 pub fn option_functor_test() {
   let double = fn(x) { x * 2 }
 
-  option.None
-  |> {
-    double
-    |> fun.option_functor().fmap()
-  }
+  fun.option_functor().fmap(double)(option.None)
   |> should.equal(option.None)
 
   option.Some(2)
   |> fun.option_functor().fmap(double)
   |> should.equal(option.Some(4))
-
-  fun.option_fmap(double)(option.Some(7))
-  |> should.equal(option.Some(14))
 }

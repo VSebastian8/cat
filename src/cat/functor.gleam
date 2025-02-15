@@ -1,8 +1,9 @@
+import cat
 import gleam/option.{type Option, None, Some}
 
 /// `Functor` type in gleam.
 /// ```
-/// // Haskell implementation
+/// // Haskell type class
 /// class Functor f where
 ///     fmap :: (a -> b) -> f a -> f b
 /// ```
@@ -47,6 +48,13 @@ pub type Functor(f, a, b, c, d) {
 pub type OptionF
 
 /// `Option Functor Instance` (generic over a and b).
+/// ```
+/// // Haskell instance
+/// instance Functor Maybe where
+///     fmap :: (a -> b) -> Maybe a -> Maybe b
+///     fmap _ Nothing = Nothing
+///     fmap f (Just x) = Just (f x)
+/// ```
 /// ### Examples
 /// ```gleam
 /// let double = fn(x) { x * 2 }
@@ -57,22 +65,62 @@ pub type OptionF
 /// // -> Some(4)
 /// ```
 pub fn option_functor() -> Functor(OptionF, a, b, Option(a), Option(b)) {
-  Functor(fmap: option_fmap)
+  Functor(fmap: fn(f: fn(a) -> b) -> fn(Option(a)) -> Option(b) {
+    fn(m) {
+      case m {
+        None -> None
+        Some(x) -> Some(f(x))
+      }
+    }
+  })
 }
 
-/// `Fmap` function for Option Functor. \
-/// This function can also be used directly (skipping the wrapper type Functor).
-/// ### Examples
+/// Phantom type for `List Functor`
+pub type ListF
+
+/// `fmap` for List Functor.
 /// ```gleam
-/// let double = fn(x) { x * 2 }
-/// option_fmap(double)(Some(7))
-/// // -> Some(14)
+/// // fmap is similar to list.map()
 /// ```
-pub fn option_fmap(f: fn(a) -> b) -> fn(Option(a)) -> Option(b) {
-  fn(m) {
-    case m {
-      None -> None
-      Some(x) -> Some(f(x))
+fn list_fmap(f: fn(a) -> b) -> fn(List(a)) -> List(b) {
+  fn(l) {
+    case l {
+      [] -> []
+      [x, ..rest] -> [f(x), ..list_fmap(f)(rest)]
     }
   }
+}
+
+/// `List Functor Instance`.
+/// ```
+/// // Haskell instance
+/// instance Functor [] where
+///     fmap :: (a -> b) -> [a] -> [b]
+///     fmap _ [] = []
+///     fmap f (x:xs) = (f x):(fmap f xs)
+/// ```
+/// ### Examples
+/// ```gleam
+/// ```
+pub fn list_functor() -> Functor(ListF, a, b, List(a), List(b)) {
+  Functor(fmap: list_fmap)
+}
+
+/// Phantom type for `Reader Functor`
+pub type ReaderF
+
+/// `Reader Functor Instace`.
+/// ```
+/// // Haskell instance
+/// instance Functor ((->) r) where
+///     fmap :: (a -> b) -> (r -> a) -> (r -> b)
+///     fmap f g = f . g
+/// ```
+/// ### Examples
+/// ```gleam
+/// ```
+pub fn reader_functor() -> Functor(ReaderF, a, b, fn(r) -> a, fn(r) -> b) {
+  Functor(fmap: fn(f: fn(a) -> b) -> fn(fn(r) -> a) -> fn(r) -> b {
+    fn(g: fn(r) -> a) -> fn(r) -> b { cat.compose(f, g) }
+  })
 }
