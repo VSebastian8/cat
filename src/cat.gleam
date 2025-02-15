@@ -283,6 +283,16 @@ pub type List(a) {
   Cons(List(a))
 }
 
+/// `Const` type from Haskell.
+/// ```
+/// data Const c a = Const c
+/// ```
+/// Only the first parameter affects the type, the second is ignore. \
+/// In gleam, we say that `a` is a `phantom type`.
+pub type Const(c, a) {
+  Const(c)
+}
+
 pub fn main() {
   io.println("Category Theory!")
 }

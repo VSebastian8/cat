@@ -1,4 +1,4 @@
-import cat
+import cat.{type Const, Const}
 import gleam/option.{type Option, None, Some}
 
 /// `Functor` type in gleam.
@@ -75,13 +75,10 @@ pub fn option_functor() -> Functor(OptionF, a, b, Option(a), Option(b)) {
   })
 }
 
-/// Phantom type for `List Functor`
+/// Phantom type for `List Functor`.
 pub type ListF
 
 /// `fmap` for List Functor.
-/// ```gleam
-/// // fmap is similar to list.map()
-/// ```
 fn list_fmap(f: fn(a) -> b) -> fn(List(a)) -> List(b) {
   fn(l) {
     case l {
@@ -99,15 +96,12 @@ fn list_fmap(f: fn(a) -> b) -> fn(List(a)) -> List(b) {
 ///     fmap _ [] = []
 ///     fmap f (x:xs) = (f x):(fmap f xs)
 /// ```
-/// ### Examples
-/// ```gleam
-/// ```
 pub fn list_functor() -> Functor(ListF, a, b, List(a), List(b)) {
   Functor(fmap: list_fmap)
 }
 
-/// Phantom type for `Reader Functor`
-pub type ReaderF
+/// Phantom type for `Reader Functor`.
+pub type ReaderF(r)
 
 /// `Reader Functor Instace`.
 /// ```
@@ -116,11 +110,28 @@ pub type ReaderF
 ///     fmap :: (a -> b) -> (r -> a) -> (r -> b)
 ///     fmap f g = f . g
 /// ```
-/// ### Examples
-/// ```gleam
-/// ```
-pub fn reader_functor() -> Functor(ReaderF, a, b, fn(r) -> a, fn(r) -> b) {
+pub fn reader_functor() -> Functor(ReaderF(r), a, b, fn(r) -> a, fn(r) -> b) {
   Functor(fmap: fn(f: fn(a) -> b) -> fn(fn(r) -> a) -> fn(r) -> b {
     fn(g: fn(r) -> a) -> fn(r) -> b { cat.compose(f, g) }
+  })
+}
+
+/// Phantom type for `Const Functor`. \
+/// We bind the first parameter of Const.
+pub type ConstF(c)
+
+/// `Const Functor Instance`.
+/// ```
+/// // Haskell instance
+/// instance Functor (Const c) where
+///     fmap :: (a -> b) -> Const c a -> Const c b
+///     fmap _ (Const v) = Const v  
+/// ```
+pub fn const_functor() -> Functor(ConstF(c), a, b, Const(c, a), Const(c, b)) {
+  Functor(fmap: fn(_: fn(a) -> b) -> fn(Const(c, a)) -> Const(c, b) {
+    fn(con) {
+      let Const(val) = con
+      Const(val)
+    }
   })
 }

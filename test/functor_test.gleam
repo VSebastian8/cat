@@ -1,5 +1,8 @@
+import cat
 import cat/functor as fun
+import gleam/bool
 import gleam/float
+import gleam/int
 import gleam/option
 import gleeunit/should
 
@@ -48,4 +51,22 @@ pub fn option_functor_test() {
   option.Some(2)
   |> fun.option_functor().fmap(double)
   |> should.equal(option.Some(4))
+}
+
+pub fn list_functor_test() {
+  fun.list_functor().fmap(int.to_string)([1, 3, 4])
+  |> should.equal(["1", "3", "4"])
+}
+
+pub fn reader_functor_test() {
+  let f = fn(x) { x % 2 == 0 }
+  let g = bool.to_string
+
+  fun.reader_functor().fmap(g)(f)(19)
+  |> should.equal("False")
+}
+
+pub fn const_functor_test() {
+  fun.const_functor().fmap(int.to_string)(cat.Const(True))
+  |> should.equal(cat.Const(True))
 }
