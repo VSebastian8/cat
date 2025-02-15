@@ -1,3 +1,5 @@
+//// Test module for cat/monoid.gleam
+
 import cat/monoid as mono
 import gleam/option
 import gleeunit/should

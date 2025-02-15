@@ -1,3 +1,5 @@
+//// Test module for cat/functor.gleam
+
 import cat
 import cat/functor as fun
 import gleam/bool
@@ -85,7 +87,8 @@ pub fn functor_compose_test() {
   |> should.equal(option.Some(["2", "3", "4"]))
 }
 
-pub fn functor_laws() {
+/// Testing the identity and composition preservation.
+pub fn functor_laws_test() {
   list.map(list.range(0, 100), fn(i) {
     fun.option_functor().fmap(cat.id)(option.Some(i))
     |> should.equal(option.Some(i))
@@ -99,4 +102,31 @@ pub fn functor_laws() {
       cat.compose(fun.option_functor().fmap(g), fun.option_functor().fmap(f))
     should.equal(first(option.Some(i)), second(option.Some(i)))
   })
+}
+
+/// Testing the tuple functor instance.
+pub fn tuple_functor_test() {
+  fun.tuple_functor().fmap(bool.negate)(#(9, False))
+  |> should.equal(#(9, True))
+}
+
+/// Testing the triple functor instance.
+pub fn triple_functor_test() {
+  fun.triple_functor().fmap(bool.negate)(#("abc", 9, False))
+  |> should.equal(#("abc", 9, True))
+}
+
+/// Testing the pair functor instance.
+pub fn pair_functor_test() {
+  fun.pair_functor().fmap(bool.negate)(cat.Pair(9, False))
+  |> should.equal(cat.Pair(9, True))
+}
+
+/// Testing the either functor instance.
+pub fn either_functor_test() {
+  fun.either_functor().fmap(bool.negate)(cat.Left(27))
+  |> should.equal(cat.Left(27))
+
+  fun.either_functor().fmap(bool.negate)(cat.Right(False))
+  |> should.equal(cat.Right(True))
 }

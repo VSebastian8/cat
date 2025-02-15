@@ -1,3 +1,5 @@
+//// Test module for cat/monad.gleam
+
 import cat/monad.{Writer, fish, return}
 import gleam/string
 import gleeunit/should

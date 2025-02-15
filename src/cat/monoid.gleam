@@ -1,6 +1,6 @@
-//// The Monoid module contains the `Monoid` type with who's minimal implementations are `mempty` and `mappend`. \
-//// We also define the `mconcat` function in terms of mempty and mappend. \
-//// Finally, this module contains several instances for the monoid type.
+//// `Monoid` type {minimal implementation - `mempty` and `mappend`}. \
+//// The `mconcat` function is defined in terms of mempty and mappend. \
+//// Several instances: Unit, Bool (All and Any), List, Option, Tuple, Triple, Function.
 
 import gleam/bool
 import gleam/list

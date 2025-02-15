@@ -1,4 +1,4 @@
-//// This module contains various isomorphisms (morphisms that are invertible).
+//// `Isomorphisms` (morphisms that are invertible) describing various equations. \
 //// Algebra on Types (Void = 0, Nil = 1, Bool = 2, Either(a, b) = a + b, Pair(a, b) = a * b, Maybe(a) = 1 + a)
 
 import cat.{

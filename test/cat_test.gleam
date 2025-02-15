@@ -1,3 +1,5 @@
+//// Test module for cat.gleam
+
 import cat
 import gleam/int
 import gleam/list

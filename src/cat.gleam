@@ -1,4 +1,4 @@
-//// Module contains basic category concepts such as: composition, identity, unit, maybe, product, coproduct.
+//// `Basic category concepts`: composition, identity, Void, 0unit, option (Maybe), product (Pair), coproduct (Either).
 
 import gleam/io
 import gleam/option.{type Option, None, Some}

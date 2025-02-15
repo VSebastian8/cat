@@ -1,3 +1,5 @@
+//// Test module for cat/algebra.gleam
+
 import cat.{Just, Left, Nothing, Pair, Right}
 import cat/algebra as alg
 import gleeunit/should

@@ -1,4 +1,7 @@
-import cat.{type Const, Const}
+//// `Functor` type {minimal implementation - `fmap`}. \
+//// Functor composition and various functor instances: Option, List, Reader, Const, Tuple, Triple, Pair, Either.
+
+import cat.{type Const, type Either, type Pair, Const, Left, Pair, Right}
 import gleam/option.{type Option, None, Some}
 
 /// `Functor` type in gleam.
@@ -153,5 +156,71 @@ pub fn const_functor() -> Functor(ConstF(c), a, b, Const(c, a), Const(c, b)) {
       let Const(val) = con
       Const(val)
     }
+  })
+}
+
+/// Phantom type for `Tuple Functor`.
+pub type TupleF(a)
+
+/// `Tuple Functor`.
+/// ### Examples
+/// ```gleam
+/// tuple_functor().fmap(bool.negate)(#(9, False))
+/// // -> #(9, True)
+/// ```
+pub fn tuple_functor() -> Functor(TupleF(a), b, c, #(a, b), #(a, c)) {
+  Functor(fmap: fn(f: fn(b) -> c) -> fn(#(a, b)) -> #(a, c) {
+    fn(p: #(a, b)) { #(p.0, f(p.1)) }
+  })
+}
+
+/// Phantom type for `Pair Functor`.
+pub type PairF(a)
+
+/// `Pair Functor`.
+/// ### Examples
+/// ```gleam
+/// pair_functor().fmap(bool.negate)(Pair(9, False))
+/// // -> Pair(9, True)
+/// ```
+pub fn pair_functor() -> Functor(PairF(a), b, c, Pair(a, b), Pair(a, c)) {
+  Functor(fmap: fn(f: fn(b) -> c) -> fn(Pair(a, b)) -> Pair(a, c) {
+    fn(p) {
+      let Pair(x, y) = p
+      Pair(x, f(y))
+    }
+  })
+}
+
+/// Phantom type for `Either Functor`.
+pub type EitherF(a)
+
+/// `Either Functor`
+/// ### Examples
+/// ```gleam
+/// ```
+pub fn either_functor() -> Functor(EitherF(a), b, c, Either(a, b), Either(a, c)) {
+  Functor(fmap: fn(f: fn(b) -> c) -> fn(Either(a, b)) -> Either(a, c) {
+    fn(e) {
+      case e {
+        Left(x) -> Left(x)
+        Right(y) -> Right(f(y))
+      }
+    }
+  })
+}
+
+/// Phantom type for `Triple Functor`.
+pub type TripleF(a, b)
+
+/// `Triple Functor`.
+/// ### Examples
+/// ```gleam
+/// triple_functor().fmap(bool.negate)(#("abc", 9, False))
+/// // -> #("abc", 9, True)
+/// ```
+pub fn triple_functor() -> Functor(TripleF(a, b), c, d, #(a, b, c), #(a, b, d)) {
+  Functor(fmap: fn(f: fn(c) -> d) -> fn(#(a, b, c)) -> #(a, b, d) {
+    fn(p: #(a, b, c)) { #(p.0, p.1, f(p.2)) }
   })
 }
