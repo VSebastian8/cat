@@ -1,6 +1,6 @@
 //// Test module for cat/monad.gleam
 
-import cat/monad.{Writer, fish, return}
+import cat/monad.{Reader, Writer, fish, reader_return, writer_return}
 import gleam/string
 import gleeunit/should
 
@@ -13,6 +13,17 @@ pub fn writer_test() {
   process("Anna has apples")
   |> should.equal(Writer(["ANNA", "HAS", "APPLES"], "upCase toWords "))
 
-  return(27)
+  writer_return(27)
   |> should.equal(Writer(27, ""))
+}
+
+/// Testing the reader type.
+pub fn reader_test() {
+  let r = Reader(fn(x) { x % 2 == 1 })
+  r.apply(6)
+  |> should.equal(False)
+
+  let f = fn(x) { x * 3 }
+  reader_return(f)
+  |> should.equal(Reader(f))
 }

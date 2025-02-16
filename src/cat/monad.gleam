@@ -1,4 +1,4 @@
-//// This module contains monad definitions.
+//// `Writer` and `Reader` types.
 
 /// Encapsulates a pair whose first component is a `value` of arbitrary type a and the second component is a `string`. \
 /// Used to `embellish` the return values of functions.
@@ -11,6 +11,18 @@
 /// ```
 pub type Writer(a) {
   Writer(a, String)
+}
+
+/// The `identity morphism` for the Writer category.
+/// ### Examples
+/// ```gleam
+/// writer_return(2)
+/// // -> Writer(2, "")
+/// writer_return("abcd")
+/// // -> Writer("abcd", "") 
+/// ```
+pub fn writer_return(x: a) -> Writer(a) {
+  Writer(x, "")
 }
 
 /// `Composition` for the embellished functions that return the Writer type.
@@ -40,14 +52,27 @@ pub fn fish(
   }
 }
 
-/// The `identity morphism` for the Writer category.
+/// Encapsulates a function.
+/// ```
+/// type Reader r a = r -> a
+/// ```
 /// ### Examples
 /// ```gleam
-/// return(2)
-/// // -> Writer(2, "")
-/// return("abcd")
-/// // -> Writer("abcd", "") 
+/// let r = Reader(fn(x) { x % 2 == 1 })
+/// r.apply(6)
+/// // -> False
 /// ```
-pub fn return(x: a) -> Writer(a) {
-  Writer(x, "")
+pub type Reader(r, a) {
+  Reader(apply: fn(r) -> a)
+}
+
+/// The `identity morphism` for the Reader category.
+/// ### Examples
+/// ```gleam
+/// let f = fn(x) {x * 3}
+/// reader_return(f)
+/// // -> Reader(f)
+/// ```
+pub fn reader_return(f: fn(r) -> a) -> Reader(r, a) {
+  Reader(apply: f)
 }

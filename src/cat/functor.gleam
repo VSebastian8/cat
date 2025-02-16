@@ -169,30 +169,6 @@ pub fn list_functor() -> Functor(ListF, a, b, List(a), List(b)) {
   Functor(fmap: list_fmap)
 }
 
-/// Phantom type for `Reader Functor`.
-pub type ReaderF(r)
-
-/// `Reader Functor Instace`.
-/// ```
-/// // Haskell instance
-/// instance Functor ((->) r) where
-///     fmap :: (a -> b) -> (r -> a) -> (r -> b)
-///     fmap f g = f . g
-/// ```
-/// ### Examples
-/// ```gleam
-/// let f = fn(x) { x % 2 == 0 }
-/// let g = bool.to_string
-/// 
-/// reader_functor().fmap(g)(f)(19)
-/// // -> "False"
-/// ```
-pub fn reader_functor() -> Functor(ReaderF(r), a, b, fn(r) -> a, fn(r) -> b) {
-  Functor(fmap: fn(f: fn(a) -> b) -> fn(fn(r) -> a) -> fn(r) -> b {
-    fn(g: fn(r) -> a) -> fn(r) -> b { cat.compose(f, g) }
-  })
-}
-
 /// Phantom type for `Const Functor`. \
 /// We bind the first parameter of Const.
 pub type ConstF(c)
@@ -286,7 +262,7 @@ pub fn triple_functor() -> Functor(TripleF(a, b), c, d, #(a, b, c), #(a, b, d)) 
 /// Phntom type for `Writer Functor`.
 pub type WriterF
 
-/// `Writer Functor `.
+/// `Writer Functor Instance`.
 /// ```
 /// // Haskell Instance
 /// fmap :: (a -> b) -> Writer a -> Writer b
@@ -306,6 +282,63 @@ pub fn writer_functor() -> Functor(
   monad.Writer(b),
 ) {
   Functor(fmap: fn(f: fn(a) -> b) {
-    monad.fish(cat.id, cat.compose(monad.return, f))
+    monad.fish(cat.id, cat.compose(monad.writer_return, f))
+  })
+}
+
+/// Phantom type for `Reader Functor`.
+pub type ReaderF(r)
+
+/// `Reader Functor Instance`.
+/// ```
+/// // Haskell implementation
+/// instance Functor (Reader r) where
+///   fmap :: (a -> b) -> Reader r a -> Reader r b
+///   fmap f g = f . g
+/// ```
+/// ### Examples
+/// ```gleam
+/// let ra = Reader(fn(x) { x % 2 == 0 })
+/// let f = bool.to_string
+///
+/// reader_functor().fmap(f)(ra).apply(19)
+/// // -> "False"
+/// ```
+pub fn reader_functor() -> Functor(
+  ReaderF(r),
+  a,
+  b,
+  monad.Reader(r, a),
+  monad.Reader(r, b),
+) {
+  Functor(fmap: fn(f: fn(a) -> b) {
+    fn(ra: monad.Reader(r, a)) -> monad.Reader(r, b) {
+      let monad.Reader(g) = ra
+      monad.Reader(cat.compose(f, g))
+    }
+  })
+}
+
+/// Phantom type for `Function Functor`.
+pub type FunctionF(r)
+
+/// `(->) Functor Instance`.
+/// ```
+/// // Haskell instance
+/// instance Functor ((->) r) where
+///     fmap :: (a -> b) -> (r -> a) -> (r -> b)
+///     fmap f g = f . g
+/// ```
+/// ### Examples
+/// ```gleam
+/// let f = fn(x) { x % 2 == 0 }
+/// let g = bool.to_string
+/// 
+/// function_functor().fmap(g)(f)(19)
+/// // -> "False"
+/// ```
+pub fn function_functor() -> Functor(FunctionF(r), a, b, fn(r) -> a, fn(r) -> b) {
+  Functor(fmap: fn(f: fn(a) -> b) -> fn(fn(r) -> a) -> fn(r) -> b {
+    fn(g: fn(r) -> a) -> fn(r) -> b { cat.compose(f, g) }
   })
 }

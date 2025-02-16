@@ -85,15 +85,6 @@ pub fn list_functor_test() {
   |> should.equal(["1", "3", "4"])
 }
 
-/// Testing the reader functor instance.
-pub fn reader_functor_test() {
-  let f = fn(x) { x % 2 == 0 }
-  let g = bool.to_string
-
-  fun.reader_functor().fmap(g)(f)(19)
-  |> should.equal("False")
-}
-
 /// Testing the const functor instance.
 pub fn const_functor_test() {
   fun.const_functor().fmap(int.to_string)(cat.Const(True))
@@ -134,6 +125,24 @@ pub fn either_functor_test() {
 
   fun.either_functor().fmap(bool.negate)(cat.Right(False))
   |> should.equal(cat.Right(True))
+}
+
+/// Testing the function (reader) functor instance.
+pub fn function_functor_test() {
+  let g = fn(x) { x % 2 == 0 }
+  let f = bool.to_string
+
+  fun.function_functor().fmap(f)(g)(19)
+  |> should.equal("False")
+}
+
+/// Testing the reader functor instance.
+pub fn reader_functor_test() {
+  let ra = monad.Reader(fn(x) { x % 2 == 0 })
+  let f = bool.to_string
+
+  fun.reader_functor().fmap(f)(ra).apply(19)
+  |> should.equal("False")
 }
 
 /// Testing the writer functor instance.
