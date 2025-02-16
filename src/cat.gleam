@@ -1,4 +1,6 @@
-//// `Basic category concepts`: composition, identity, Void, unit, option (Maybe), product (Pair), coproduct (Either), Identity, and Const.
+//// `Basic category concepts` \
+//// Functions: composition, identity, unit, constant, flip. \
+//// Types: Void, option (Maybe), product (Pair), coproduct (Either), Identity, and Const.
 
 import gleam/io
 import gleam/option.{type Option, None, Some}
@@ -309,6 +311,27 @@ pub type Identity(a) {
 /// ```
 pub type Const(c, a) {
   Const(c)
+}
+
+/// `const` function.
+/// ### Examples
+/// ```gleam
+/// constant(1)(2)
+/// // -> 1
+/// ```
+pub fn constant(x: c) -> fn(_) -> c {
+  fn(_) { x }
+}
+
+/// `flip` function.
+/// ### Examples
+/// ```gleam
+/// let f = fn(x: Int, y: Bool) { int.to_string(x) <> " " <> bool.to_string(y) }
+/// flip(f)(True, 23)
+/// // -> "23 True"
+/// ```
+pub fn flip(f: fn(a, b) -> c) -> fn(b, a) -> c {
+  fn(y, x) { f(x, y) }
 }
 
 pub fn main() {

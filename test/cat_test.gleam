@@ -1,6 +1,7 @@
 //// Test module for cat.gleam
 
 import cat
+import gleam/bool
 import gleam/int
 import gleam/list
 import gleam/option
@@ -102,4 +103,23 @@ pub fn maybe_test() {
 
   cat.option_to_maybe(option.Some("a"))
   |> should.equal(cat.Just("a"))
+}
+
+/// Testing the constant function.
+pub fn constant_test() {
+  7
+  |> cat.constant("abc")
+  |> should.equal("abc")
+
+  2
+  |> { 1 |> cat.constant }
+  |> should.equal(1)
+}
+
+/// Testing the flip function
+pub fn flip() {
+  let f = fn(x: Int, y: Bool) { int.to_string(x) <> " " <> bool.to_string(y) }
+
+  cat.flip(f)(True, 23)
+  |> should.equal("23 True")
 }

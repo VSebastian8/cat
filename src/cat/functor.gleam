@@ -56,7 +56,7 @@ pub type Functor(f, a, b, fa, fb) {
   Functor(fmap: fn(fn(a) -> b) -> fn(fa) -> fb)
 }
 
-/// Haskell (<$) operator.
+/// Haskell `(<$)` operator.
 /// ```
 /// (<$) :: a -> f b -> f a
 /// x <$ m = fmap (const x) m 
@@ -69,7 +69,7 @@ pub type Functor(f, a, b, fa, fb) {
 /// // -> None
 /// ```
 pub fn replace(functor: Functor(_, _, a, fb, fa)) -> fn(a, fb) -> fa {
-  fn(x, m) { functor.fmap(fn(_) { x })(m) }
+  fn(x, m) { functor.fmap(cat.constant(x))(m) }
 }
 
 /// Functor `composition`. \
@@ -93,7 +93,7 @@ pub type IdentityF
 
 /// `Identity Functor Instance`.
 /// ```
-/// // Haskell instance
+/// // Haskell implementation
 /// instance Functor Maybe where
 ///     fmap :: (a -> b) -> Identity a -> Identity b
 ///     fmap f (Identity x) = Identity(f x)
@@ -259,7 +259,7 @@ pub fn triple_functor() -> Functor(TripleF(a, b), c, d, #(a, b, c), #(a, b, d)) 
   })
 }
 
-/// Phntom type for `Writer Functor`.
+/// Phantom type for `Writer Functor`.
 pub type WriterF
 
 /// `Writer Functor Instance`.
