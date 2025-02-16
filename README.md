@@ -68,7 +68,7 @@ import gleam/option
 
 pub fn main() {
   // Either bifunctor
-  let either_bf = bif.either_bifunctor()
+  let either_bf = bf.either_bifunctor()
   // Const () functor
   let const_f = fun.const_functor()
   // Identity functor
@@ -76,13 +76,13 @@ pub fn main() {
 
   // Constructing the maybe functor:
   // Maybe b = Either (Const () a) (Identity b)
-  let maybe_functor = fn() -> bif.Bifunctor(
-    bif.BiCompF(bif.EitherBF, fun.ConstF(Nil), fun.IdentityF),
+  let maybe_functor = fn() -> bf.Bifunctor(
+    bf.BiCompF(bf.EitherBF, fun.ConstF(Nil), fun.IdentityF),
     a, b, c, d,
     cat.Either(cat.Const(Nil, a), cat.Identity(b)),
     cat.Either(cat.Const(Nil, c), cat.Identity(d)),
   ) {
-    bif.bifunctor_compose(either_bf, const_f, id_f)
+    bf.bifunctor_compose(either_bf, const_f, id_f)
   }
 
   cat.Left(cat.Const(Nil))

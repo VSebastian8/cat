@@ -2,6 +2,7 @@
 
 import cat
 import cat/functor as fun
+import cat/monad
 import gleam/bool
 import gleam/float
 import gleam/int
@@ -133,4 +134,11 @@ pub fn either_functor_test() {
 
   fun.either_functor().fmap(bool.negate)(cat.Right(False))
   |> should.equal(cat.Right(True))
+}
+
+/// Testing the writer functor instance.
+pub fn writer_functor_test() {
+  monad.Writer(16, "message")
+  |> fun.writer_functor().fmap(fn(x) { x % 4 == 0 })
+  |> should.equal(monad.Writer(True, "message"))
 }

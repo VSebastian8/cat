@@ -6,6 +6,7 @@ import cat.{
   type Const, type Either, type Identity, type Pair, Const, Identity, Left, Pair,
   Right,
 }
+import cat/monad
 import gleam/option.{type Option, None, Some}
 
 /// `Functor` type in gleam.
@@ -248,7 +249,7 @@ pub fn pair_functor() -> Functor(PairF(a), b, c, Pair(a, b), Pair(a, c)) {
 /// Phantom type for `Either Functor`.
 pub type EitherF(a)
 
-/// `Either Functor`
+/// `Either Functor`.
 /// ### Examples
 /// ```gleam
 /// either_functor().fmap(bool.negate)(Left(27))
@@ -279,5 +280,32 @@ pub type TripleF(a, b)
 pub fn triple_functor() -> Functor(TripleF(a, b), c, d, #(a, b, c), #(a, b, d)) {
   Functor(fmap: fn(f: fn(c) -> d) -> fn(#(a, b, c)) -> #(a, b, d) {
     fn(p: #(a, b, c)) { #(p.0, p.1, f(p.2)) }
+  })
+}
+
+/// Phntom type for `Writer Functor`.
+pub type WriterF
+
+/// `Writer Functor `.
+/// ```
+/// // Haskell Instance
+/// fmap :: (a -> b) -> Writer a -> Writer b
+/// fmap f = id >=> (\x -> return (f x))
+/// ```
+/// ### Examples
+/// ```gleam
+/// monad.Writer(16, "message")
+/// |> writer_functor().fmap(fn(x) { x % 4 == 0 })
+/// // -> monad.Writer(True, "message")
+/// ```
+pub fn writer_functor() -> Functor(
+  WriterF,
+  a,
+  b,
+  monad.Writer(a),
+  monad.Writer(b),
+) {
+  Functor(fmap: fn(f: fn(a) -> b) {
+    monad.fish(cat.id, cat.compose(monad.return, f))
   })
 }
