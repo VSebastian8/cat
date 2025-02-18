@@ -252,3 +252,30 @@ pub fn omicron(f: fn(c) -> fn(b) -> a) -> fn(Pair(b, c)) -> a {
 pub fn omicron_inv(g: fn(Pair(b, c)) -> a) -> fn(c) -> fn(b) -> a {
   fn(z) { fn(y) { g(Pair(y, z)) } }
 }
+
+/// `Modus Ponens`. \
+/// __((a -> b) ∧ a) -> b__
+pub fn eval(p: Pair(fn(a) -> b, a)) -> b {
+  let Pair(f, x) = p
+  f(x)
+}
+
+/// `Logical not`. \
+/// __¬p = p -> False__
+pub fn not(_: p) -> fn(p) -> Void {
+  fn(_) { panic }
+}
+
+/// `Modus Tollens`. \
+/// __(a -> b) ∧ ¬b -> ¬a__
+pub fn composition(p: Pair(fn(a) -> b, fn(b) -> Void)) -> fn(a) -> Void {
+  let Pair(f, notb) = p
+  fn(x) { notb(f(x)) }
+}
+
+/// `Chain Rule`. \
+/// __(a -> b) ∧ (b -> c) -> (a -> c)__
+pub fn transitivity(p: Pair(fn(a) -> b, fn(b) -> c)) -> fn(a) -> c {
+  let Pair(f, g) = p
+  fn(x) { g(f(x)) }
+}
