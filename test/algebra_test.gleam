@@ -2,6 +2,8 @@
 
 import cat.{Const, Identity, Just, Left, Nothing, Pair, Right}
 import cat/algebra as alg
+import gleam/bool
+import gleam/int
 import gleeunit/should
 
 // Testing the isomorphisms: swap and switch.
@@ -108,4 +110,64 @@ pub fn maybe_adt_test() {
   Right(Identity(2))
   |> alg.gamma_inv
   |> should.equal(Just(2))
+}
+
+/// Testing the isomorphisms: zeta, eta, and theta.
+pub fn exponentials_basic_test() {
+  alg.zeta(cat.absurd)
+  |> should.equal(Nil)
+
+  alg.zeta_inv(Nil)
+  |> should.equal(cat.absurd)
+
+  alg.eta(cat.unit)
+  |> should.equal(Nil)
+
+  alg.eta_inv(Nil)
+  |> should.equal(cat.unit)
+
+  alg.theta(fn(_) { 42 })
+  |> should.equal(42)
+
+  alg.theta_inv(42)(Nil)
+  |> should.equal(42)
+}
+
+/// Testing the isomorphisms: epsilon, upsilon, and omicron.
+pub fn exponentials_properties_test() {
+  let p1 =
+    alg.epsilon(fn(e) {
+      case e {
+        Left(x) -> int.to_string(x)
+        Right(y) -> bool.to_string(y)
+      }
+    })
+  p1.fst(42)
+  |> should.equal("42")
+  p1.snd(True)
+  |> should.equal("True")
+
+  let f1 = alg.epsilon_inv(Pair(int.to_string, bool.to_string))
+  f1(Left(42))
+  |> should.equal("42")
+  f1(Right(True))
+  |> should.equal("True")
+
+  let p2 = alg.upsilon(fn(x) { Pair(x * 2, x % 2 == 0) })
+  p2.fst(4)
+  |> should.equal(8)
+  p2.snd(4)
+  |> should.equal(True)
+
+  let f2 = alg.upsilon_inv(Pair(fn(x) { x * 2 }, fn(x) { x % 2 == 0 }))
+  f2(4)
+  |> should.equal(Pair(8, True))
+
+  let f3 = alg.omicron(fn(x) { fn(y) { x + y } })
+  f3(Pair(3, 4))
+  |> should.equal(7)
+
+  let f4 = alg.omicron_inv(fn(p) { p.fst + p.snd })
+  f4(1)(2)
+  |> should.equal(3)
 }

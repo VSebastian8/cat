@@ -1,5 +1,5 @@
 //// `Isomorphisms` (morphisms that are invertible) describing various equations. \
-//// Algebra on Types (Void = 0, Nil = 1, Bool = 2, Either(a, b) = a + b, Pair(a, b) = a * b, Maybe(a) = 1 + a)
+//// Algebra on Types (Void = 0, Nil = 1, Bool = 2, Either(a, b) = a + b, Pair(a, b) = a * b, Maybe(a) = 1 + a, Isomorphism = ==, Function fn(a) -> b = Exponential b ^ a)
 
 import cat.{
   type Const, type Either, type Identity, type Maybe, type Pair, type Void,
@@ -174,4 +174,81 @@ pub fn gamma_inv(e: Either(Const(Nil, a), Identity(b))) -> Maybe(b) {
     Left(_) -> Nothing
     Right(Identity(x)) -> Just(x)
   }
+}
+
+/// `Zero-th Power`. \
+/// __a ^ 0 = 1__
+pub fn zeta(_absurd: fn(Void) -> a) -> Nil {
+  Nil
+}
+
+/// Inverse `Zero-th Power`. \
+/// __1 = a ^ 0__
+pub fn zeta_inv(_unit: Nil) -> fn(Void) -> a {
+  cat.absurd
+}
+
+/// `Powers of One`. \
+/// __1 ^ a = 1__
+pub fn eta(_unit_fun: fn(a) -> Nil) -> Nil {
+  Nil
+}
+
+/// Inverse `Powers of One`. \
+/// __1 = 1 ^ a__
+pub fn eta_inv(_unit: Nil) -> fn(a) -> Nil {
+  cat.unit
+}
+
+/// `First Power`. \
+/// __a ^ 1 = a__
+pub fn theta(select: fn(Nil) -> a) -> a {
+  select(Nil)
+}
+
+/// Inverse `First Power`. \
+/// __a = a ^ 1__
+pub fn theta_inv(x: a) -> fn(Nil) -> a {
+  cat.constant(x)
+}
+
+/// `Exponentials of Sums`. \
+/// __a ^ (b + c) = (a ^ b) * (a ^ c)__
+pub fn epsilon(f: fn(Either(b, c)) -> a) -> Pair(fn(b) -> a, fn(c) -> a) {
+  Pair(fn(y) { f(Left(y)) }, fn(z) { f(Right(z)) })
+}
+
+/// Inverse `Exponentials of Sums`. \
+/// __(a ^ b) * (a ^ c) = a ^ (b + c)__
+pub fn epsilon_inv(p: Pair(fn(b) -> a, fn(c) -> a)) -> fn(Either(b, c)) -> a {
+  fn(e) {
+    case e {
+      Left(y) -> p.fst(y)
+      Right(z) -> p.snd(z)
+    }
+  }
+}
+
+/// `Exponentials over Products`. \
+/// __(a * b) ^ c = (a ^ c) * (b ^ c)__
+pub fn upsilon(f: fn(c) -> Pair(a, b)) -> Pair(fn(c) -> a, fn(c) -> b) {
+  Pair(fn(z) { f(z).fst }, fn(z) { f(z).snd })
+}
+
+/// Inverse `Exponentials over Products`. \
+/// __(a ^ c) * (b ^ c) = (a * b) ^ c__
+pub fn upsilon_inv(g: Pair(fn(c) -> a, fn(c) -> b)) -> fn(c) -> Pair(a, b) {
+  fn(z) { Pair(g.fst(z), g.snd(z)) }
+}
+
+/// `Exponentials of Exponentials`. \
+/// __(a ^ b) ^ c = a ^ (b * c)__
+pub fn omicron(f: fn(c) -> fn(b) -> a) -> fn(Pair(b, c)) -> a {
+  fn(p: Pair(b, c)) { f(p.snd)(p.fst) }
+}
+
+/// Inverse `Exponentials of Exponentials`. \
+/// __(a ^ b) ^ c = a ^ (b * c)__
+pub fn omicron_inv(g: fn(Pair(b, c)) -> a) -> fn(c) -> fn(b) -> a {
+  fn(z) { fn(y) { g(Pair(y, z)) } }
 }
