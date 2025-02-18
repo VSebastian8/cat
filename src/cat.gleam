@@ -1,8 +1,7 @@
 //// `Basic category concepts` \
-//// Functions: composition, identity, unit, constant, flip. \
+//// Functions: composition, identity, unit, constant, flip, curry, uncurry. \
 //// Types: Void, option (Maybe), product (Pair), coproduct (Either), Identity, and Const.
 
-import gleam/io
 import gleam/option.{type Option, None, Some}
 
 /// The `identity function` is a `unit of composition`.
@@ -334,6 +333,33 @@ pub fn flip(f: fn(a, b) -> c) -> fn(b, a) -> c {
   fn(y, x) { f(x, y) }
 }
 
+/// Transforms a function that takes `2 arguments` into a function that takes `one argument` and returns a `partial function`.
+/// ### Examples
+/// ```gleam
+/// let map_123 = [1, 2, 3] |> curry(list.map)
+/// map_123(fn(x) { x + 1 })
+/// // -> [2, 3, 4]
+/// map_123(fn(x) { x * 2 })
+/// // -> [2, 4, 6]
+/// ```
+pub fn curry(f: fn(a, b) -> c) -> fn(a) -> fn(b) -> c {
+  fn(x) { fn(y) { f(x, y) } }
+}
+
+/// Transforms a function that takes `one argument` and returns a `partial function` into a function that takes `2 arguments.
+/// ### Examples
+/// ```gleam
+/// let add_partial = fn(x) { fn(y) { x + y } }
+/// let add = uncurry(add_partial)
+/// add(2, 5)
+/// // -> 7
+/// add(1, 1)
+/// // -> 2
+/// ```
+pub fn uncurry(g: fn(a) -> fn(b) -> c) -> fn(a, b) -> c {
+  fn(x, y) { g(x)(y) }
+}
+
 pub fn main() {
-  io.println("Category Theory!")
+  Nil
 }

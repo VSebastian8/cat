@@ -116,10 +116,26 @@ pub fn constant_test() {
   |> should.equal(1)
 }
 
-/// Testing the flip function
+/// Testing the flip function.
 pub fn flip() {
   let f = fn(x: Int, y: Bool) { int.to_string(x) <> " " <> bool.to_string(y) }
 
   cat.flip(f)(True, 23)
   |> should.equal("23 True")
+}
+
+/// Testing the curry and uncurry functions.
+pub fn curry_test() {
+  let map_123 = [1, 2, 3] |> cat.curry(list.map)
+  map_123(fn(x) { x + 1 })
+  |> should.equal([2, 3, 4])
+  map_123(fn(x) { x * 2 })
+  |> should.equal([2, 4, 6])
+
+  let add_partial = fn(x) { fn(y) { x + y } }
+  let add = cat.uncurry(add_partial)
+  add(2, 5)
+  |> should.equal(7)
+  add(1, 1)
+  |> should.equal(2)
 }
