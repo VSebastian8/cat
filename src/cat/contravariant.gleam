@@ -13,7 +13,7 @@ import cat/functor as fun
 /// ```
 /// ### Contravariant laws:
 /// - Preservation of `identity`: **contramap id = id**
-/// - Preservation of `composition`: **contramap (g . h) = (contramap h) . (contramap g)** 
+/// - Preservation of `composition`: **contramap (g ∘ h) = (contramap h) ∘ (contramap g)** 
 /// 
 /// See [`functor type`](#Functor) for convention.
 pub type Contravariant(f, a, b, fa, fb) {
@@ -23,7 +23,7 @@ pub type Contravariant(f, a, b, fa, fb) {
 /// Haskell `(>$)` operator.
 /// ```
 /// (>$) :: b -> f b -> f a
-/// (>$) = contramap . const
+/// (>$) = contramap ∘ const
 /// ```
 /// ### Examples
 /// ```gleam
@@ -113,7 +113,7 @@ pub type OpC(r)
 /// // Haskell implementation
 /// instance Contravariant (Op r) where
 ///     contramap :: (b -> a) -> Op r a -> Op r b
-///     contramap f g = g . f
+///     contramap f g = g∘. f
 /// ```
 /// ### Examples
 /// ```gleam

@@ -10,8 +10,8 @@ import gleam/option.{type Option, None, Some}
 /// id a = a
 /// ```
 /// It follows the identity conditions:
-/// - f . id == f
-/// - id . f == f
+/// - f ∘ id == f
+/// - id ∘ f == f
 /// ### Examples
 /// ```gleam
 /// id(3)
@@ -25,11 +25,11 @@ pub fn id(x: a) -> a {
 
 /// Given a function `f` that takes an argument of type A and returns a B, and another function `g` that takes a B and returns a C, you can `compose` them by `passing the result of f to g`. 
 /// ```
-/// (.) :: (b -> c) -> (a -> b) -> (a -> c)
-/// (g . f) x = f (g x)
+/// (∘) :: (b -> c) -> (a -> b) -> (a -> c)
+/// (g ∘ f) x = g (f x)
 /// ```
 /// Properties of composition:
-/// - Associativity h . (g . f) == (h . g) . f == h . g . f
+/// - Associativity h ∘ (g ∘ f) == (h ∘ g) ∘ f == h ∘ g ∘ f
 /// - Identity see [`id`](#id) for more info
 /// ### Examples
 /// ```gleam

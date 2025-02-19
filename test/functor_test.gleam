@@ -94,7 +94,7 @@ pub fn const_functor_test() {
 /// Testing the functor composition.
 pub fn functor_compose_test() {
   option.Some([1, 2, 3])
-  |> fun.functor_compose(fun.list_functor(), fun.option_functor())(fn(x) {
+  |> fun.functor_compose(fun.option_functor(), fun.list_functor()).fmap(fn(x) {
     int.to_string(x + 1)
   })
   |> should.equal(option.Some(["2", "3", "4"]))

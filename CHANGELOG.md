@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.4.1 - 2025-02-19
+
+- Used generic functions to mimic `instance constraints`.
+- Made `NaturalTransformation` into an `opaque type`.
+- Fixed `functor composition`.
+
 ## v0.4.0 - 2025-02-18
 
 - `NaturalTransformation` type with examples and `composition`.

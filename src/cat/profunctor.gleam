@@ -10,7 +10,7 @@ import cat
 /// // Haskel definition
 /// class Profunctor p where
 ///   dimap :: (a -> b) -> (c -> d) -> p b c -> p a d
-///   dimap f g = lmap f . rmap g
+///   dimap f g = lmap f ∘ rmap g
 ///   lmap :: (a -> b) -> p b c -> p a c
 ///   lmap f = dimap f id
 ///   rmap :: (c -> d) -> p a c -> p a d
@@ -71,9 +71,9 @@ pub type ArrowPro
 /// ```
 /// // Haskell implementation
 /// instance Profunctor (->) where
-///   dimap ab cd bc = cd . bc . ab
-///   lmap = flip (.)
-///   rmap = (.)
+///   dimap ab cd bc = cd ∘ bc ∘ ab
+///   lmap = flip (∘)
+///   rmap = (∘)
 /// ```
 /// ### Examples
 /// ```gleam

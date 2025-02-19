@@ -17,7 +17,7 @@ import gleam/option.{type Option, None, Some}
 /// ```
 /// ### Functor laws
 /// - Preservation of `identity`: **fmap id = id**
-/// - Preservation of `composition`: **fmap (g . h) = (fmap g) . (fmap h)**
+/// - Preservation of `composition`: **fmap (g ∘ h) = (fmap g) ∘ (fmap h)**
 /// 
 /// Since gleam does not have `Higher Kinded Types`, we cannot pass the type constructor to the Functor type. \
 /// We would like pass Option as f and then use f(a) as a type in the fmap definition.
@@ -77,15 +77,15 @@ pub fn replace(functor: Functor(_, _, a, fb, fa)) -> fn(a, fb) -> fa {
 /// ### Examples
 /// ```gleam
 /// Some([1, 2, 3])
-/// |> functor_compose(list_functor(), option_functor())
+/// |> functor_compose(option_functor(), list_functor()).fmap
 /// ( fn(x) { int.to_string(x + 1) } )
 /// // -> Some(["2", "3", "4"])
 /// ```
 pub fn functor_compose(
-  g: Functor(_, a, b, ga, gb),
-  f: Functor(_, ga, gb, fga, fgb),
-) {
-  cat.compose(f.fmap, g.fmap)
+  g: Functor(g, fa, fb, gfa, gfb),
+  f: Functor(f, a, b, fa, fb),
+) -> Functor(Pair(g, f), a, b, gfa, gfb) {
+  Functor(fmap: cat.compose(g.fmap, f.fmap))
 }
 
 // Phantom type for `Identity Functor`.
@@ -294,7 +294,7 @@ pub type ReaderF(r)
 /// // Haskell implementation
 /// instance Functor (Reader r) where
 ///   fmap :: (a -> b) -> Reader r a -> Reader r b
-///   fmap f g = f . g
+///   fmap f g = f ∘ g
 /// ```
 /// ### Examples
 /// ```gleam
@@ -327,7 +327,7 @@ pub type FunctionF(r)
 /// // Haskell instance
 /// instance Functor ((->) r) where
 ///     fmap :: (a -> b) -> (r -> a) -> (r -> b)
-///     fmap f g = f . g
+///     fmap f g = f ∘ g
 /// ```
 /// ### Examples
 /// ```gleam
