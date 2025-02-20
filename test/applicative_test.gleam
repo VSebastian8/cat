@@ -1,5 +1,8 @@
-import cat/applicative as app
-import cat/functor as fun
+//// Test module for cat/applicative.gleam
+
+import cat/applicative.{apply, pure}
+import cat/instances/applicative as app
+import cat/instances/functor as fun
 import gleam/int
 import gleam/option
 import gleeunit/should
@@ -7,13 +10,13 @@ import gleeunit/should
 /// Testing the option applicative instance.
 pub fn option_app_test() {
   9
-  |> { app.option_applicative() |> app.pure() }
+  |> { app.option_applicative() |> pure() }
   |> should.equal(option.Some(9))
 
   let option_f =
     int.to_string
-    |> { app.option_applicative() |> app.pure() }
-    |> { app.option_applicative() |> app.apply }
+    |> { app.option_applicative() |> pure() }
+    |> { app.option_applicative() |> apply() }
 
   option.None |> option_f |> should.equal(option.None)
   option.Some(12) |> option_f |> should.equal(option.Some("12"))
@@ -24,7 +27,7 @@ pub fn list_app_test() {
   [1, 2, 3]
   |> {
     [fn(x) { x * 2 }, fn(x) { x + 10 }]
-    |> app.apply(app.list_applicative())
+    |> apply(app.list_applicative())
   }
   |> should.equal([2, 4, 6, 11, 12, 13])
 }
@@ -35,7 +38,7 @@ pub fn option_list_test() {
   |> {
     [fn(x) { x * 2 }, fn(x) { x + 10 }]
     |> fun.list_functor().fmap(fun.option_functor().fmap)
-    |> app.apply(app.list_applicative())
+    |> apply(app.list_applicative())
   }
   |> should.equal([
     option.Some(2),

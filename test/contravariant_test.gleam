@@ -1,6 +1,11 @@
+//// Test module for cat/contravariant.gleam
+
 import cat
-import cat/contravariant as con
+import cat/contravariant.{
+  type Contravariant, Contravariant, phantom, replace, replace_flip,
+}
 import cat/functor as fun
+import cat/instances/contravariant as con
 import gleam/int
 import gleeunit/should
 
@@ -23,11 +28,11 @@ pub fn operators_test() {
   let o = con.Op(int.to_string)
   // Doesn't matter what value/type we use for the final apply  
   True
-  |> con.replace(con.op_contravariant())(7, o).apply
+  |> replace(con.op_contravariant())(7, o).apply
   |> should.equal("7")
 
   [1, 2, 3]
-  |> con.replace_flip(con.op_contravariant())(o, 7).apply
+  |> replace_flip(con.op_contravariant())(o, 7).apply
   |> should.equal("7")
 }
 
@@ -36,10 +41,10 @@ pub type UnitF
 pub fn phantom_test() {
   let unit_functor: fun.Functor(UnitF, _, _, _, Nil) =
     fun.Functor(fmap: fn(_) { cat.unit })
-  let unit_contravariant: con.Contravariant(UnitF, _, _, Nil, _) =
-    con.Contravariant(contramap: fn(_) { cat.unit })
+  let unit_contravariant: Contravariant(UnitF, _, _, Nil, _) =
+    Contravariant(contramap: fn(_) { cat.unit })
 
   "abc"
-  |> con.phantom(unit_functor, unit_contravariant)
+  |> phantom(unit_functor, unit_contravariant)
   |> should.equal(Nil)
 }

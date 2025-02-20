@@ -1,6 +1,6 @@
 //// Test module for cat/monad.gleam
 
-import cat/monad.{Reader, Writer, fish, reader_return, writer_return}
+import cat/instances/monad.{Reader, Writer, fish, reader_return, writer_return}
 import gleam/string
 import gleeunit/should
 

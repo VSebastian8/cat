@@ -13,13 +13,14 @@ Functor Example
 
 ```gleam
 import cat/functor as fun
+import cat/instances/functor as inst
 import gleam/option
 import gleam/io
 
 pub fn main() {
 
   option.Some([1, 2, 3])
-  |> fun.functor_compose(fun.list_functor(), fun.option_functor())(fn(x) {
+  |> fun.functor_compose(inst.list_functor(), inst.option_functor())(fn(x) {
     x % 2 == 0
   })
   |> io.debug()
@@ -31,6 +32,7 @@ Applicative Example
 
 ```gleam
 import cat/applicative as app
+import cat/instances/applicative as inst
 import cat/functor as fun
 import gleam/option.{None, Some}
 import gleam/io
@@ -40,7 +42,7 @@ pub fn main() {
   |> {
     [fn(x) { x * 2 }, fn(x) { x + 10 }]
     |> fun.list_functor().fmap(fun.option_functor().fmap)
-    |> app.apply(app.list_applicative())
+    |> app.apply(inst.list_applicative())
   }
   |> io.debug()
   // -> [Some(2), None, Some(6), Some(11), None, Some(13)]
@@ -83,13 +85,14 @@ Bifunctor Example
 
 ```gleam
 import cat
-import cat/functor as fun
 import cat/bifunctor as bf
+import cat/instances/functor as fun
+import cat/instances/bifunctor as inst
 import gleam/io
 
 pub fn main() {
   // Either bifunctor
-  let either_bf = bf.either_bifunctor()
+  let either_bf = inst.either_bifunctor()
   // Const () functor
   let const_f = fun.const_functor()
   // Identity functor

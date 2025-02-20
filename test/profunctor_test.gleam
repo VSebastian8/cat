@@ -1,4 +1,7 @@
-import cat/profunctor as pro
+//// Test module for cat/profunctor.gleam
+
+import cat/instances/profunctor as pro
+import cat/profunctor.{lmap, rmap}
 import gleam/bool
 import gleam/list
 import gleeunit/should
@@ -30,7 +33,7 @@ pub fn lmap_test() {
   // Profunctor pbc: Function b -> c (Int -> Bool)
   let h = fn(x) { x % 2 == 0 }
   // Resulting Profunctor pac: Function a -> c ([Int] -> Bool)
-  let z = pro.lmap(pro.function_profunctor())(f)(h)
+  let z = lmap(pro.function_profunctor())(f)(h)
 
   [1, 2, 3]
   |> z
@@ -48,7 +51,7 @@ pub fn rmap_test() {
   // Profunctor pac: Function a -> c ([Int] -> Bool)
   let h = fn(x) { list.length(x) % 2 == 0 }
   // Resulting Profunctor pad: Function ([Int] -> String)
-  let z = pro.rmap(pro.function_profunctor())(g)(h)
+  let z = rmap(pro.function_profunctor())(g)(h)
 
   [1, 2, 3]
   |> z

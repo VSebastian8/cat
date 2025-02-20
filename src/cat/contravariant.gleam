@@ -1,6 +1,5 @@
 //// `Contravariant` functor type {minimal implementation - `contramap`}. \
-//// Default implementations for: `replace`, `replace_flip` (>$ and $< operators). \
-//// `Op type`, its Contravariant instance, and `phantom` function.
+//// Default implementations for: `replace`, `replace_flip` (>$ and $< operators), and `phantom` function.
 
 import cat
 import cat/functor as fun
@@ -89,47 +88,4 @@ pub fn phantom(
     |> fun.replace(functor)(Nil, _)
     |> replace_flip(contra)(Nil)
   }
-}
-
-/// Type for `reverse` functions.
-/// ```
-/// type Op r a = a -> r
-/// ```
-/// ### Examples
-/// ```gleam
-/// let o = Op(fn(x) { x % 2 == 1 })
-/// o.apply(6)
-/// // -> False
-/// ```
-pub type Op(r, a) {
-  Op(apply: fn(a) -> r)
-}
-
-/// Phantom type for `Op Contravariant`.
-pub type OpC(r)
-
-/// `Op Contravariant Instance`.
-/// ```
-/// // Haskell implementation
-/// instance Contravariant (Op r) where
-///     contramap :: (b -> a) -> Op r a -> Op r b
-///     contramap f g = g∘. f
-/// ```
-/// ### Examples
-/// ```gleam
-/// let f = fn(b) {
-///     case b {
-///       True -> 2
-///       False -> 4
-///     }
-///  }
-/// let original = Op(fn(x) { int.to_string(x * 2) })
-/// let result = op_contravariant().contramap(f)(original)
-/// result.apply(False)
-/// // -> "8"
-/// ```
-pub fn op_contravariant() -> Contravariant(OpC(r), a, b, Op(r, a), Op(r, b)) {
-  Contravariant(contramap: fn(f: fn(a) -> b) {
-    fn(g: Op(r, b)) -> Op(r, a) { Op(cat.flip(cat.compose)(f, g.apply)) }
-  })
 }

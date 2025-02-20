@@ -1,8 +1,11 @@
 //// Test module for cat/bifunctor.gleam
 
 import cat
-import cat/bifunctor as bif
-import cat/functor as fun
+import cat/bifunctor.{
+  type BiCompF, type Bifunctor, bifunctor_compose, first, second,
+}
+import cat/instances/bifunctor as bif
+import cat/instances/functor as fun
 import gleam/bool
 import gleam/int
 import gleeunit/should
@@ -13,7 +16,7 @@ pub fn first_test() {
     int.to_string
     |> {
       bif.pair_bifunctor()
-      |> bif.first
+      |> first
     }
 
   first_show(cat.Pair(8, 9))
@@ -22,7 +25,7 @@ pub fn first_test() {
 
 /// Testing the second function.
 pub fn second_test() {
-  let second_show = bif.second(bif.either_bifunctor())(int.to_string)
+  let second_show = second(bif.either_bifunctor())(int.to_string)
 
   cat.Left(8)
   |> second_show
@@ -72,8 +75,8 @@ pub fn bifunctor_compose_test() {
 
   // Constructing the maybe functor:
   // Maybe b = Either (Const () a) (Identity b)
-  let maybe_functor = fn() -> bif.Bifunctor(
-    bif.BiCompF(bif.EitherBF, fun.ConstF(Nil), fun.IdentityF),
+  let maybe_functor = fn() -> Bifunctor(
+    BiCompF(bif.EitherBF, fun.ConstF(Nil), fun.IdentityF),
     a,
     b,
     c,
@@ -81,7 +84,7 @@ pub fn bifunctor_compose_test() {
     cat.Either(cat.Const(Nil, a), cat.Identity(b)),
     cat.Either(cat.Const(Nil, c), cat.Identity(d)),
   ) {
-    bif.bifunctor_compose(either_bf, const_f, id_f)
+    bifunctor_compose(either_bf, const_f, id_f)
   }
   // bimap is equivalent to fmap:
   // fmap :: (b -> d) -> Maybe b -> Maybe d

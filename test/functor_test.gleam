@@ -1,8 +1,9 @@
 //// Test module for cat/functor.gleam
 
 import cat
-import cat/functor as fun
-import cat/monad
+import cat/functor.{type Functor, Functor, functor_compose, replace}
+import cat/instances/functor as fun
+import cat/instances/monad
 import gleam/bool
 import gleam/float
 import gleam/int
@@ -15,14 +16,8 @@ type IdentityF
 
 pub fn functor_test() {
   // Instance of Identity for Functor:
-  let id_f = fn() -> fun.Functor(
-    IdentityF,
-    a,
-    b,
-    cat.Identity(a),
-    cat.Identity(b),
-  ) {
-    fun.Functor(fmap: fn(f) {
+  let id_f = fn() -> Functor(IdentityF, a, b, cat.Identity(a), cat.Identity(b)) {
+    Functor(fmap: fn(f) {
       fn(idx) {
         let cat.Identity(x) = idx
         cat.Identity(f(x))
@@ -43,10 +38,10 @@ pub fn functor_test() {
 
 /// Testing the replace function.
 pub fn replace_test() {
-  fun.replace(fun.option_functor())("a", option.Some(2))
+  replace(fun.option_functor())("a", option.Some(2))
   |> should.equal(option.Some("a"))
 
-  fun.replace(fun.option_functor())("a", option.None)
+  replace(fun.option_functor())("a", option.None)
   |> should.equal(option.None)
 }
 
@@ -94,7 +89,7 @@ pub fn const_functor_test() {
 /// Testing the functor composition.
 pub fn functor_compose_test() {
   option.Some([1, 2, 3])
-  |> fun.functor_compose(fun.option_functor(), fun.list_functor()).fmap(fn(x) {
+  |> functor_compose(fun.option_functor(), fun.list_functor()).fmap(fn(x) {
     int.to_string(x + 1)
   })
   |> should.equal(option.Some(["2", "3", "4"]))

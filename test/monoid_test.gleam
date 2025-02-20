@@ -1,13 +1,13 @@
 //// Test module for cat/monoid.gleam
 
-import cat/monoid as mono
+import cat/instances/monoid as mono
+import cat/monoid.{type Monoid, Monoid, mconcat}
 import gleam/option
 import gleeunit/should
 
 /// Testing the Monoid type: mempty, mappend and mconcat.
 pub fn monoid_type_test() {
-  let int_sum_monoid =
-    mono.Monoid(mempty: 0, mappend: fn(x: Int, y: Int) { x + y })
+  let int_sum_monoid = Monoid(mempty: 0, mappend: fn(x: Int, y: Int) { x + y })
 
   int_sum_monoid.mappend(7, 8)
   |> should.equal(15)
@@ -15,11 +15,10 @@ pub fn monoid_type_test() {
   int_sum_monoid.mappend(4, int_sum_monoid.mempty)
   |> should.equal(4)
 
-  let int_prod_monoid =
-    mono.Monoid(mempty: 1, mappend: fn(x: Int, y: Int) { x * y })
+  let int_prod_monoid = Monoid(mempty: 1, mappend: fn(x: Int, y: Int) { x * y })
 
   int_prod_monoid
-  |> mono.mconcat([2, 3, int_prod_monoid.mempty, 4, int_prod_monoid.mempty])
+  |> mconcat([2, 3, int_prod_monoid.mempty, 4, int_prod_monoid.mempty])
   |> int_prod_monoid.mappend(10)
   |> should.equal(240)
 }
@@ -64,9 +63,7 @@ pub fn monoid_list_test() {
 /// Testing the option monoid.
 pub fn monoid_option_test() {
   let mono_string =
-    mono.Monoid(mempty: "", mappend: fn(x: String, y: String) -> String {
-      x <> y
-    })
+    Monoid(mempty: "", mappend: fn(x: String, y: String) -> String { x <> y })
   let mono_maybe = mono.option_monoid(mono_string)
 
   option.Some("ab")
