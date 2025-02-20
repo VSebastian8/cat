@@ -9,12 +9,50 @@ This package implements several category theory concepts, following [this book](
 gleam add cat
 ```
 
+Functor Example
+
+```gleam
+import cat/functor as fun
+import gleam/option
+import gleam/io
+
+pub fn main() {
+
+  option.Some([1, 2, 3])
+  |> fun.functor_compose(fun.list_functor(), fun.option_functor())(fn(x) {
+    x % 2 == 0
+  })
+  |> io.debug()
+  // -> option.Some([True, False, True])
+}
+```
+
+Applicative Example
+
+```gleam
+import cat/applicative as app
+import cat/functor as fun
+import gleam/option.{None, Some}
+import gleam/io
+
+pub fn main() {
+  [Some(1), None, Some(3)]
+  |> {
+    [fn(x) { x * 2 }, fn(x) { x + 10 }]
+    |> fun.list_functor().fmap(fun.option_functor().fmap)
+    |> app.apply(app.list_applicative())
+  }
+  |> io.debug()
+  // -> [Some(2), None, Some(6), Some(11), None, Some(13)]
+}
+```
+
 Monoid Example
 
 ```gleam
 import cat.{type Either, Left, Right}
 import cat/monoid as mono
-
+import gleam/io
 
 pub fn main() {
    let either_sum_monoid =
@@ -31,30 +69,13 @@ pub fn main() {
 
   either_sum_monoid
   |> mono.mconcat([Left(2), Left(3), Left(4)])
-  |> io.debug
+  |> io.debug()
   // -> Left(9)
 
   either_sum_monoid
   |> mono.mconcat([Left(2), Right("error"), Left(4)])
-  |> io.debug
+  |> io.debug()
   // -> Right("error")
-}
-```
-
-Functor Example
-
-```gleam
-import cat/functor as fun
-import gleam/option
-
-pub fn main() {
-
-  option.Some([1, 2, 3])
-  |> fun.functor_compose(fun.list_functor(), fun.option_functor())(fn(x) {
-    x % 2 == 0
-  })
-  |> io.debug
-  // -> option.Some([True, False, True])
 }
 ```
 
@@ -64,7 +85,7 @@ Bifunctor Example
 import cat
 import cat/functor as fun
 import cat/bifunctor as bf
-import gleam/option
+import gleam/io
 
 pub fn main() {
   // Either bifunctor
@@ -87,12 +108,12 @@ pub fn main() {
 
   cat.Left(cat.Const(Nil))
   |> maybe_functor().bimap(fn(_) { panic }, int.to_string)
-  |> io.debug
+  |> io.debug()
   // -> cat.Left(cat.Const(Nil))
 
   cat.Right(cat.Identity(3))
   |> maybe_functor().bimap(fn(_) { panic }, int.to_string)
-  |> io.debug
+  |> io.debug()
   // -> cat.Right(cat.Identity("3"))
 }
 ```
