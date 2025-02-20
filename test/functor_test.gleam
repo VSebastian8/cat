@@ -3,7 +3,6 @@
 import cat
 import cat/functor.{type Functor, Functor, functor_compose, replace}
 import cat/instances/functor as fun
-import cat/instances/monad
 import gleam/bool
 import gleam/float
 import gleam/int
@@ -133,7 +132,7 @@ pub fn function_functor_test() {
 
 /// Testing the reader functor instance.
 pub fn reader_functor_test() {
-  let ra = monad.Reader(fn(x) { x % 2 == 0 })
+  let ra = cat.Reader(fn(x) { x % 2 == 0 })
   let f = bool.to_string
 
   fun.reader_functor().fmap(f)(ra).apply(19)
@@ -142,7 +141,7 @@ pub fn reader_functor_test() {
 
 /// Testing the writer functor instance.
 pub fn writer_functor_test() {
-  monad.Writer(16, "message")
+  cat.Writer(16, "message")
   |> fun.writer_functor().fmap(fn(x) { x % 4 == 0 })
-  |> should.equal(monad.Writer(True, "message"))
+  |> should.equal(cat.Writer(True, "message"))
 }

@@ -1,78 +1,37 @@
 //// Monad instances: Writer, Reader.
 
-/// Encapsulates a pair whose first component is a `value` of arbitrary type a and the second component is a `string`. \
-/// Used to `embellish` the return values of functions.
-/// ### Examples
-/// ```gleam
-/// // Original function
-/// f = fn(x) {x * 2}
-/// // Embellished function
-/// f = fn(x) {Writer(x * 2, "doubled ")}
+import cat.{type Reader, type Writer, Reader, Writer}
+import cat/applicative as app
+import cat/instances/applicative.{reader_applicative, writer_applicative}
+import cat/monad.{new}
+
+/// Monad instance for `Reader`.
 /// ```
-pub type Writer(a) {
-  Writer(a, String)
+/// instance Monad ((->) r) where
+///   f >>= k = \ r -> k (f r) r
+///```
+pub fn reader_monad() {
+  new(reader_applicative, app.pure(reader_applicative()), fn(ra: Reader(r, a)) {
+    fn(f: fn(a) -> Reader(r, b)) {
+      Reader(apply: fn(x) { f(ra.apply(x)).apply(x) })
+    }
+  })
 }
 
-/// The `identity morphism` for the Writer category.
-/// ### Examples
-/// ```gleam
-/// writer_return(2)
-/// // -> Writer(2, "")
-/// writer_return("abcd")
-/// // -> Writer("abcd", "") 
+/// Monad instance for `Writer`.
 /// ```
-pub fn writer_return(x: a) -> Writer(a) {
-  Writer(x, "")
-}
-
-/// `Composition` for the embellished functions that return the Writer type.
+/// instance Monad Writer where
+///  ma >>= k = 
+///   let (va, log1) = runWriter ma
+///       (vb, log2) = runWriter (k va)
+///   in  Writer (vb, log1 ++ log2)
 /// ```
-/// (>=>) :: (a -> Writer b) -> (b -> Writer c) -> (a -> Writer c)
-/// m1 >=> m2 = \x -> 
-///   let (y, s1) = m1 x
-///       (z, s2) = m2 y
-///   in (z, s1 ++ s2)
-/// ```
-/// ### Examples
-/// ```gleam
-/// let up_case = fn(s: String) { Writer(string.uppercase(s), "upCase ") }
-/// let to_words = fn(s: String) { Writer(string.split(s, " "), "toWords ") }
-/// let process = fish(up_case, to_words)
-/// process("Anna has apples")
-/// // -> Writer(["ANNA", "HAS", "APPLES"], "upCase toWords ")
-/// ```
-pub fn fish(
-  m1: fn(a) -> Writer(b),
-  m2: fn(b) -> Writer(c),
-) -> fn(a) -> Writer(c) {
-  fn(x) {
-    let Writer(y, s1) = m1(x)
-    let Writer(z, s2) = m2(y)
-    Writer(z, s1 <> s2)
-  }
-}
-
-/// Encapsulates a function.
-/// ```
-/// type Reader r a = r -> a
-/// ```
-/// ### Examples
-/// ```gleam
-/// let r = Reader(fn(x) { x % 2 == 1 })
-/// r.apply(6)
-/// // -> False
-/// ```
-pub type Reader(r, a) {
-  Reader(apply: fn(r) -> a)
-}
-
-/// The `identity morphism` for the Reader category.
-/// ### Examples
-/// ```gleam
-/// let f = fn(x) {x * 3}
-/// reader_return(f)
-/// // -> Reader(f)
-/// ```
-pub fn reader_return(f: fn(r) -> a) -> Reader(r, a) {
-  Reader(apply: f)
+pub fn writer_monad() {
+  new(writer_applicative, fn(x) { Writer(x, "") }, fn(wa: Writer(a)) {
+    fn(f: fn(a) -> Writer(b)) {
+      let Writer(x, msg1) = wa
+      let Writer(y, msg2) = f(x)
+      Writer(y, msg1 <> msg2)
+    }
+  })
 }

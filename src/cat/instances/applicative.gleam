@@ -1,7 +1,10 @@
-//// `Applicative` instances: Option, List.
+//// `Applicative` instances: Option, List, Reader, Writer.
 
+import cat.{type Reader, type Writer, Reader, Writer}
 import cat/applicative.{new}
-import cat/instances/functor.{list_functor, option_functor}
+import cat/instances/functor.{
+  list_functor, option_functor, reader_functor, writer_functor,
+}
 import gleam/list
 import gleam/option
 
@@ -61,5 +64,29 @@ pub fn list_applicative() {
   let functor = list_functor
   new(functor, fn(x) { [x] }, fn(lf) {
     fn(la) { lf |> list.flat_map(fn(f) { la |> list.map(f) }) }
+  })
+}
+
+/// Applicative instance for `Reader`.
+pub fn reader_applicative() {
+  new(
+    reader_functor,
+    fn(x) { Reader(apply: cat.constant(x)) },
+    fn(rg: Reader(r, fn(a) -> b)) {
+      fn(f: Reader(r, a)) -> Reader(r, b) {
+        Reader(apply: fn(r) { rg.apply(r)(f.apply(r)) })
+      }
+    },
+  )
+}
+
+/// Applicative instance for `Writer`.
+pub fn writer_applicative() {
+  new(writer_functor, fn(x) { Writer(x, "") }, fn(wf: Writer(fn(a) -> b)) {
+    fn(wx: Writer(a)) -> Writer(b) {
+      let Writer(f, msg1) = wf
+      let Writer(x, msg2) = wx
+      Writer(f(x), msg1 <> msg2)
+    }
   })
 }

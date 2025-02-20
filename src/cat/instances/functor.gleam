@@ -1,11 +1,10 @@
-//// `Functor` instances: Option, List, Reader, Const, Tuple, Triple, Pair, Either.
+//// `Functor` instances: Option, List, Reader, Writer, Const, Tuple, Triple, Pair, Either.
 
 import cat.{
-  type Const, type Either, type Identity, type Pair, Const, Identity, Left, Pair,
-  Right,
+  type Const, type Either, type Identity, type Pair, type Reader, type Writer,
+  Const, Identity, Left, Pair, Reader, Right, Writer, fish,
 }
 import cat/functor.{type Functor, Functor}
-import cat/instances/monad
 import gleam/option.{type Option, None, Some}
 
 // Phantom type for `Identity Functor`.
@@ -194,15 +193,9 @@ pub type WriterF
 /// |> writer_functor().fmap(fn(x) { x % 4 == 0 })
 /// // -> monad.Writer(True, "message")
 /// ```
-pub fn writer_functor() -> Functor(
-  WriterF,
-  a,
-  b,
-  monad.Writer(a),
-  monad.Writer(b),
-) {
+pub fn writer_functor() -> Functor(WriterF, a, b, Writer(a), Writer(b)) {
   Functor(fmap: fn(f: fn(a) -> b) {
-    monad.fish(cat.id, cat.compose(monad.writer_return, f))
+    fish(cat.id, cat.compose(fn(x) { Writer(x, "") }, f))
   })
 }
 
@@ -224,17 +217,11 @@ pub type ReaderF(r)
 /// reader_functor().fmap(f)(ra).apply(19)
 /// // -> "False"
 /// ```
-pub fn reader_functor() -> Functor(
-  ReaderF(r),
-  a,
-  b,
-  monad.Reader(r, a),
-  monad.Reader(r, b),
-) {
+pub fn reader_functor() -> Functor(ReaderF(r), a, b, Reader(r, a), Reader(r, b)) {
   Functor(fmap: fn(f: fn(a) -> b) {
-    fn(ra: monad.Reader(r, a)) -> monad.Reader(r, b) {
-      let monad.Reader(g) = ra
-      monad.Reader(cat.compose(f, g))
+    fn(ra: Reader(r, a)) -> Reader(r, b) {
+      let Reader(g) = ra
+      Reader(cat.compose(f, g))
     }
   })
 }

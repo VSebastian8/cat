@@ -5,6 +5,7 @@ import gleam/bool
 import gleam/int
 import gleam/list
 import gleam/option
+import gleam/string
 import gleeunit
 import gleeunit/should
 
@@ -138,4 +139,21 @@ pub fn curry_test() {
   |> should.equal(7)
   add(1, 1)
   |> should.equal(2)
+}
+
+/// Testing the writer type and the fish function (composition).
+pub fn writer_test() {
+  let up_case = fn(s: String) { cat.Writer(string.uppercase(s), "upCase ") }
+  let to_words = fn(s: String) { cat.Writer(string.split(s, " "), "toWords ") }
+  let process = cat.fish(up_case, to_words)
+
+  process("Anna has apples")
+  |> should.equal(cat.Writer(["ANNA", "HAS", "APPLES"], "upCase toWords "))
+}
+
+/// Testing the reader type.
+pub fn reader_test() {
+  let r = cat.Reader(fn(x) { x % 2 == 1 })
+  r.apply(6)
+  |> should.equal(False)
 }

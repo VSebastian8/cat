@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.5.0 - 2025-02-20
+
+- `Monad` opaque type.
+- Refactored code into separate files for `types` and `instances`
+- `Applicative` opaque type.
+
 ## v0.4.1 - 2025-02-19
 
 - Used generic functions to mimic `instance constraints`.
