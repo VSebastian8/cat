@@ -31,7 +31,6 @@ pub fn main() {
 Applicative Example
 
 ```gleam
-import cat/applicative as app
 import cat/instances/applicative as inst
 import cat/functor as fun
 import gleam/option.{None, Some}
@@ -42,7 +41,7 @@ pub fn main() {
   |> {
     [fn(x) { x * 2 }, fn(x) { x + 10 }]
     |> fun.list_functor().fmap(fun.option_functor().fmap)
-    |> app.apply(inst.list_applicative())
+    |> inst.list_applicative().apply
   }
   |> io.debug()
   // -> [Some(2), None, Some(6), Some(11), None, Some(13)]

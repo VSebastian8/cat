@@ -2,9 +2,7 @@
 
 import cat.{type Either, type Pair, Left, Pair, Right}
 import cat/bifunctor.{type Bifunctor, Bifunctor}
-
-/// Phantom type for `Tuple Bifunctor`.
-pub type TupleBF
+import cat/instances/types.{type EitherBF, type PairBF, type TupleBF}
 
 /// `Tuple Bifunctor`.
 /// ### Examples
@@ -19,9 +17,6 @@ pub fn tuple_bifunctor() -> Bifunctor(TupleBF, a, b, c, d, #(a, b), #(c, d)) {
   })
 }
 
-/// Phantom type for `Pair Bifunctor`.
-pub type PairBF
-
 /// `Pair Bifunctor`.
 /// ### Examples
 /// ```gleam
@@ -35,9 +30,6 @@ pub fn pair_bifunctor() -> Bifunctor(PairBF, a, b, c, d, Pair(a, b), Pair(c, d))
     fn(t: Pair(a, b)) { Pair(g(t.fst), h(t.snd)) }
   })
 }
-
-/// Phantom type for `Either Bifunctor`.
-pub type EitherBF
 
 /// `Either Bifunctor`.
 /// ### Examples

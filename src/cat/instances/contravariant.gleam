@@ -1,24 +1,8 @@
 //// `Op type` and its Contravariant instance.
 
-import cat
+import cat.{type Op, Op}
 import cat/contravariant.{type Contravariant, Contravariant}
-
-/// Type for `reverse` functions.
-/// ```
-/// type Op r a = a -> r
-/// ```
-/// ### Examples
-/// ```gleam
-/// let o = Op(fn(x) { x % 2 == 1 })
-/// o.apply(6)
-/// // -> False
-/// ```
-pub type Op(r, a) {
-  Op(apply: fn(a) -> r)
-}
-
-/// Phantom type for `Op Contravariant`.
-pub type OpC(r)
+import cat/instances/types.{type OpC}
 
 /// `Op Contravariant Instance`.
 /// ```

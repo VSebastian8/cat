@@ -5,10 +5,12 @@ import cat.{
   Const, Identity, Left, Pair, Reader, Right, Writer, fish,
 }
 import cat/functor.{type Functor, Functor}
+import cat/instances/types.{
+  type ConstF, type EitherF, type FunctionF, type IdentityF, type ListF,
+  type OptionF, type PairF, type ReaderF, type TripleF, type TupleF,
+  type WriterF,
+}
 import gleam/option.{type Option, None, Some}
-
-// Phantom type for `Identity Functor`.
-pub type IdentityF
 
 /// `Identity Functor Instance`.
 /// ```
@@ -31,9 +33,6 @@ pub fn identity_functor() -> Functor(IdentityF, a, b, Identity(a), Identity(b)) 
     }
   })
 }
-
-/// Phantom type for `Option Functor`.
-pub type OptionF
 
 /// `Option Functor Instance` (generic over a and b).
 /// ```
@@ -63,9 +62,6 @@ pub fn option_functor() -> Functor(OptionF, a, b, Option(a), Option(b)) {
   })
 }
 
-/// Phantom type for `List Functor`.
-pub type ListF
-
 /// `fmap` for List Functor.
 fn list_fmap(f: fn(a) -> b) -> fn(List(a)) -> List(b) {
   fn(l) {
@@ -88,10 +84,6 @@ pub fn list_functor() -> Functor(ListF, a, b, List(a), List(b)) {
   Functor(fmap: list_fmap)
 }
 
-/// Phantom type for `Const Functor`. \
-/// We bind the first parameter of Const.
-pub type ConstF(c)
-
 /// `Const Functor Instance`.
 /// ```
 /// // Haskell instance
@@ -108,9 +100,6 @@ pub fn const_functor() -> Functor(ConstF(c), a, b, Const(c, a), Const(c, b)) {
   })
 }
 
-/// Phantom type for `Tuple Functor`.
-pub type TupleF(a)
-
 /// `Tuple Functor`.
 /// ### Examples
 /// ```gleam
@@ -122,9 +111,6 @@ pub fn tuple_functor() -> Functor(TupleF(a), b, c, #(a, b), #(a, c)) {
     fn(p: #(a, b)) { #(p.0, f(p.1)) }
   })
 }
-
-/// Phantom type for `Pair Functor`.
-pub type PairF(a)
 
 /// `Pair Functor`.
 /// ### Examples
@@ -140,9 +126,6 @@ pub fn pair_functor() -> Functor(PairF(a), b, c, Pair(a, b), Pair(a, c)) {
     }
   })
 }
-
-/// Phantom type for `Either Functor`.
-pub type EitherF(a)
 
 /// `Either Functor`.
 /// ### Examples
@@ -163,9 +146,6 @@ pub fn either_functor() -> Functor(EitherF(a), b, c, Either(a, b), Either(a, c))
   })
 }
 
-/// Phantom type for `Triple Functor`.
-pub type TripleF(a, b)
-
 /// `Triple Functor`.
 /// ### Examples
 /// ```gleam
@@ -177,9 +157,6 @@ pub fn triple_functor() -> Functor(TripleF(a, b), c, d, #(a, b, c), #(a, b, d)) 
     fn(p: #(a, b, c)) { #(p.0, p.1, f(p.2)) }
   })
 }
-
-/// Phantom type for `Writer Functor`.
-pub type WriterF
 
 /// `Writer Functor Instance`.
 /// ```
@@ -198,9 +175,6 @@ pub fn writer_functor() -> Functor(WriterF, a, b, Writer(a), Writer(b)) {
     fish(cat.id, cat.compose(fn(x) { Writer(x, "") }, f))
   })
 }
-
-/// Phantom type for `Reader Functor`.
-pub type ReaderF(r)
 
 /// `Reader Functor Instance`.
 /// ```
@@ -225,9 +199,6 @@ pub fn reader_functor() -> Functor(ReaderF(r), a, b, Reader(r, a), Reader(r, b))
     }
   })
 }
-
-/// Phantom type for `Function Functor`.
-pub type FunctionF(r)
 
 /// `(->) Functor Instance`.
 /// ```

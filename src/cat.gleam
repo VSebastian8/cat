@@ -414,6 +414,16 @@ pub fn uncurry(g: fn(a) -> fn(b) -> c) -> fn(a, b) -> c {
   fn(x, y) { g(x)(y) }
 }
 
-pub fn main() {
-  Nil
+/// Type for `reverse functions`.
+/// ```
+/// type Op r a = a -> r
+/// ```
+/// ### Examples
+/// ```gleam
+/// let o = Op(fn(x) { x % 2 == 1 })
+/// o.apply(6)
+/// // -> False
+/// ```
+pub type Op(r, a) {
+  Op(apply: fn(a) -> r)
 }

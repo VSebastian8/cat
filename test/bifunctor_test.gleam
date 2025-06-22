@@ -1,11 +1,12 @@
 //// Test module for cat/bifunctor.gleam
 
 import cat
-import cat/bifunctor.{
-  type BiCompF, type Bifunctor, bifunctor_compose, first, second,
-}
+import cat/bifunctor.{type Bifunctor, bifunctor_compose, first, second}
 import cat/instances/bifunctor as bif
 import cat/instances/functor as fun
+import cat/instances/types.{
+  type BiCompF, type ConstF, type EitherBF, type IdentityF,
+}
 import gleam/bool
 import gleam/int
 import gleeunit/should
@@ -76,7 +77,7 @@ pub fn bifunctor_compose_test() {
   // Constructing the maybe functor:
   // Maybe b = Either (Const () a) (Identity b)
   let maybe_functor = fn() -> Bifunctor(
-    BiCompF(bif.EitherBF, fun.ConstF(Nil), fun.IdentityF),
+    BiCompF(EitherBF, ConstF(Nil), IdentityF),
     a,
     b,
     c,

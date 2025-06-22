@@ -1,10 +1,8 @@
 //// Profunctor instance for `function type`.
 
 import cat
+import cat/instances/types.{type ArrowPro}
 import cat/profunctor.{type Profunctor, Profunctor}
-
-/// Phantom type for the `function profunctor`.
-pub type ArrowPro
 
 /// `Profunctor` instance for the `function type` (->).
 /// ```

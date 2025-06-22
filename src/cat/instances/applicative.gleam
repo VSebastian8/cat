@@ -1,12 +1,13 @@
 //// `Applicative` instances: Option, List, Reader, Writer.
 
 import cat.{type Reader, type Writer, Reader, Writer}
-import cat/applicative.{Applicative}
+import cat/applicative.{type Applicative, Applicative}
 import cat/instances/functor.{
   list_functor, option_functor, reader_functor, writer_functor,
 }
+import cat/instances/types.{type ListF, type OptionF, type ReaderF, type WriterF}
 import gleam/list
-import gleam/option
+import gleam/option.{type Option, None, Some}
 
 /// Instance for `Applicative Option`.
 /// ```
@@ -33,11 +34,18 @@ import gleam/option
 /// |> option_f()
 /// // -> Some("12")
 /// ```
-pub fn option_applicative() {
-  Applicative(option_functor(), fn(x) { option.Some(x) }, fn(m) {
+pub fn option_applicative() -> Applicative(
+  OptionF,
+  a,
+  b,
+  Option(a),
+  Option(b),
+  Option(fn(a) -> b),
+) {
+  Applicative(option_functor(), fn(x) { Some(x) }, fn(m) {
     case m {
-      option.None -> fn(_) { option.None }
-      option.Some(f) -> option_functor().fmap(f)
+      None -> fn(_) { None }
+      Some(f) -> option_functor().fmap(f)
     }
   })
 }
@@ -59,14 +67,28 @@ pub fn option_applicative() {
 /// }
 /// // -> [2, 4, 6, 11, 12, 13]
 /// ```
-pub fn list_applicative() {
+pub fn list_applicative() -> Applicative(
+  ListF,
+  a,
+  b,
+  List(a),
+  List(b),
+  List(fn(a) -> b),
+) {
   Applicative(list_functor(), fn(x) { [x] }, fn(lf) {
     fn(la) { lf |> list.flat_map(fn(f) { la |> list.map(f) }) }
   })
 }
 
 /// Applicative instance for `Reader`.
-pub fn reader_applicative() {
+pub fn reader_applicative() -> Applicative(
+  ReaderF(r),
+  a,
+  b,
+  Reader(r, a),
+  Reader(r, b),
+  Reader(r, fn(a) -> b),
+) {
   Applicative(
     reader_functor(),
     fn(x) { Reader(apply: cat.constant(x)) },
@@ -79,7 +101,14 @@ pub fn reader_applicative() {
 }
 
 /// Applicative instance for `Writer`.
-pub fn writer_applicative() {
+pub fn writer_applicative() -> Applicative(
+  WriterF,
+  a,
+  b,
+  Writer(a),
+  Writer(b),
+  Writer(fn(a) -> b),
+) {
   Applicative(
     writer_functor(),
     fn(x) { Writer(x, "") },

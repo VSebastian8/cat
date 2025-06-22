@@ -4,6 +4,7 @@
 
 import cat
 import cat/functor.{type Functor}
+import cat/instances/types.{type BiCompF}
 
 /// `Bifunctor` type in gleam.
 /// ```
@@ -55,20 +56,6 @@ pub fn second(
 ) -> fn(fn(b) -> d) -> fn(fab) -> fad {
   fn(h) { bifunctor.bimap(cat.id, h) }
 }
-
-/// Bifunctor composition type. 
-/// ```
-/// newtype BiComp bf fu gu a b = BiComp (bf (fu a ) (gu b))
-/// ```
-pub type BiComp(bf, fu, gu, a, b, fua, gub, bifgab) {
-  // fua = fu(a)
-  // gub = gu(b)
-  // bifgab = bf(fua, gub)
-  BiComp(bifgab)
-}
-
-/// Phantom type for bifunctor composition.
-pub type BiCompF(bf, fu, gu)
 
 /// Composition of a `Bifunctor` with `2 Functors`.
 /// ```

@@ -10,7 +10,7 @@ import gleam/int
 import gleeunit/should
 
 pub fn op_contravariant_test() {
-  let original = con.Op(fn(x) { int.to_string(x * 2) })
+  let original = cat.Op(fn(x) { int.to_string(x * 2) })
   let f = fn(b) {
     case b {
       True -> 2
@@ -25,7 +25,7 @@ pub fn op_contravariant_test() {
 }
 
 pub fn operators_test() {
-  let o = con.Op(int.to_string)
+  let o = cat.Op(int.to_string)
   // Doesn't matter what value/type we use for the final apply  
   True
   |> replace(con.op_contravariant())(7, o).apply

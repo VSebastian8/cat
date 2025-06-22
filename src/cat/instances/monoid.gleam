@@ -25,7 +25,7 @@ pub fn unit_monoid() -> Monoid(Nil) {
 /// |> bool_and_monoid.mappend(bool_and_monoid.mempty)
 /// // -> False
 /// ```
-pub fn all_monoid() {
+pub fn all_monoid() -> Monoid(Bool) {
   Monoid(mempty: True, mappend: bool.and)
 }
 
@@ -38,7 +38,7 @@ pub fn all_monoid() {
 /// |> bool_or_monoid.mappend(bool_or_monoid.mempty)
 /// // -> False
 /// ```
-pub fn any_monoid() {
+pub fn any_monoid() -> Monoid(Bool) {
   Monoid(mempty: False, mappend: bool.or)
 }
 
@@ -52,7 +52,7 @@ pub fn any_monoid() {
 /// |> mono_list.mappend([6])
 /// // -> [1, 2, 3, 4, 5, 6]
 /// ```
-pub fn list_monoid() {
+pub fn list_monoid() -> Monoid(List(a)) {
   Monoid(mempty: [], mappend: list.append)
 }
 
