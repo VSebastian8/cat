@@ -1,9 +1,8 @@
 //// Monad instances: Writer, Reader.
 
 import cat.{type Reader, type Writer, Reader, Writer}
-import cat/applicative as app
 import cat/instances/applicative.{reader_applicative, writer_applicative}
-import cat/monad.{new}
+import cat/monad.{Monad}
 
 /// Monad instance for `Reader`.
 /// ```
@@ -11,7 +10,7 @@ import cat/monad.{new}
 ///   f >>= k = \ r -> k (f r) r
 ///```
 pub fn reader_monad() {
-  new(reader_applicative, app.pure(reader_applicative()), fn(ra: Reader(r, a)) {
+  Monad(reader_applicative(), reader_applicative().pure, fn(ra: Reader(r, a)) {
     fn(f: fn(a) -> Reader(r, b)) {
       Reader(apply: fn(x) { f(ra.apply(x)).apply(x) })
     }
@@ -27,7 +26,7 @@ pub fn reader_monad() {
 ///   in  Writer (vb, log1 ++ log2)
 /// ```
 pub fn writer_monad() {
-  new(writer_applicative, fn(x) { Writer(x, "") }, fn(wa: Writer(a)) {
+  Monad(writer_applicative(), fn(x) { Writer(x, "") }, fn(wa: Writer(a)) {
     fn(f: fn(a) -> Writer(b)) {
       let Writer(x, msg1) = wa
       let Writer(y, msg2) = f(x)

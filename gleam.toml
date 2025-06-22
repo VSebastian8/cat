@@ -1,5 +1,5 @@
 name = "cat"
-version = "0.5.0"
+version = "0.5.1"
 
 authors = ["VSebastian8"]
 description = "Category Theory concepts in Gleam!"

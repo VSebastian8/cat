@@ -81,7 +81,7 @@ pub fn replace_flip(
 /// ```
 pub fn phantom(
   functor: fun.Functor(f, a, Nil, fa, _),
-  contra: Contravariant(c, a, Nil, fb, _),
+  contra: Contravariant(f, a, Nil, fb, _),
 ) -> fn(fa) -> fb {
   fn(x) {
     x

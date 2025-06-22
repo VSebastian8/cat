@@ -1,7 +1,7 @@
 //// `Applicative` instances: Option, List, Reader, Writer.
 
 import cat.{type Reader, type Writer, Reader, Writer}
-import cat/applicative.{new}
+import cat/applicative.{Applicative}
 import cat/instances/functor.{
   list_functor, option_functor, reader_functor, writer_functor,
 }
@@ -34,11 +34,10 @@ import gleam/option
 /// // -> Some("12")
 /// ```
 pub fn option_applicative() {
-  let functor = option_functor
-  new(functor, fn(x) { option.Some(x) }, fn(m) {
+  Applicative(option_functor(), fn(x) { option.Some(x) }, fn(m) {
     case m {
       option.None -> fn(_) { option.None }
-      option.Some(f) -> functor().fmap(f)
+      option.Some(f) -> option_functor().fmap(f)
     }
   })
 }
@@ -61,16 +60,15 @@ pub fn option_applicative() {
 /// // -> [2, 4, 6, 11, 12, 13]
 /// ```
 pub fn list_applicative() {
-  let functor = list_functor
-  new(functor, fn(x) { [x] }, fn(lf) {
+  Applicative(list_functor(), fn(x) { [x] }, fn(lf) {
     fn(la) { lf |> list.flat_map(fn(f) { la |> list.map(f) }) }
   })
 }
 
 /// Applicative instance for `Reader`.
 pub fn reader_applicative() {
-  new(
-    reader_functor,
+  Applicative(
+    reader_functor(),
     fn(x) { Reader(apply: cat.constant(x)) },
     fn(rg: Reader(r, fn(a) -> b)) {
       fn(f: Reader(r, a)) -> Reader(r, b) {
@@ -82,11 +80,15 @@ pub fn reader_applicative() {
 
 /// Applicative instance for `Writer`.
 pub fn writer_applicative() {
-  new(writer_functor, fn(x) { Writer(x, "") }, fn(wf: Writer(fn(a) -> b)) {
-    fn(wx: Writer(a)) -> Writer(b) {
-      let Writer(f, msg1) = wf
-      let Writer(x, msg2) = wx
-      Writer(f(x), msg1 <> msg2)
-    }
-  })
+  Applicative(
+    writer_functor(),
+    fn(x) { Writer(x, "") },
+    fn(wf: Writer(fn(a) -> b)) {
+      fn(wx: Writer(a)) -> Writer(b) {
+        let Writer(f, msg1) = wf
+        let Writer(x, msg2) = wx
+        Writer(f(x), msg1 <> msg2)
+      }
+    },
+  )
 }

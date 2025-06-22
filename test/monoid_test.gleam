@@ -1,7 +1,7 @@
 //// Test module for cat/monoid.gleam
 
 import cat/instances/monoid as mono
-import cat/monoid.{type Monoid, Monoid, mconcat}
+import cat/monoid.{Monoid, mconcat}
 import gleam/option
 import gleeunit/should
 

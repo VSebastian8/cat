@@ -3,7 +3,7 @@
 //// Bifunctor `composition`.
 
 import cat
-import cat/functor.{type Functor, Functor}
+import cat/functor.{type Functor}
 
 /// `Bifunctor` type in gleam.
 /// ```

@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.5.1 - 2025-06-22
+
+- Reworked how `superclass constraint` is mimicked
+
 ## v0.5.0 - 2025-02-20
 
 - `Monad` opaque type.
