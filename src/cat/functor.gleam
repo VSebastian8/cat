@@ -63,7 +63,7 @@ pub type Functor(f, a, b, fa, fb) {
 /// replace(option_functor())("a", None)
 /// // -> None
 /// ```
-pub fn replace(functor: Functor(_, _, a, fb, fa)) -> fn(a, fb) -> fa {
+pub fn replace(functor: Functor(f, b, a, fb, fa)) -> fn(a, fb) -> fa {
   fn(x, m) { functor.fmap(cat.constant(x))(m) }
 }
 

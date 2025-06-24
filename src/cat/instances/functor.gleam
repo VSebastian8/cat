@@ -106,9 +106,9 @@ pub fn const_functor() -> Functor(ConstF(c), a, b, Const(c, a), Const(c, b)) {
 /// tuple_functor().fmap(bool.negate)(#(9, False))
 /// // -> #(9, True)
 /// ```
-pub fn tuple_functor() -> Functor(TupleF(a), b, c, #(a, b), #(a, c)) {
-  Functor(fmap: fn(f: fn(b) -> c) -> fn(#(a, b)) -> #(a, c) {
-    fn(p: #(a, b)) { #(p.0, f(p.1)) }
+pub fn tuple_functor() -> Functor(TupleF(c), a, b, #(c, a), #(c, b)) {
+  Functor(fmap: fn(f: fn(a) -> b) -> fn(#(c, a)) -> #(c, b) {
+    fn(p: #(c, a)) { #(p.0, f(p.1)) }
   })
 }
 
@@ -118,8 +118,8 @@ pub fn tuple_functor() -> Functor(TupleF(a), b, c, #(a, b), #(a, c)) {
 /// pair_functor().fmap(bool.negate)(Pair(9, False))
 /// // -> Pair(9, True)
 /// ```
-pub fn pair_functor() -> Functor(PairF(a), b, c, Pair(a, b), Pair(a, c)) {
-  Functor(fmap: fn(f: fn(b) -> c) -> fn(Pair(a, b)) -> Pair(a, c) {
+pub fn pair_functor() -> Functor(PairF(c), a, b, Pair(c, a), Pair(c, b)) {
+  Functor(fmap: fn(f: fn(a) -> b) -> fn(Pair(c, a)) -> Pair(c, b) {
     fn(p) {
       let Pair(x, y) = p
       Pair(x, f(y))
@@ -135,8 +135,8 @@ pub fn pair_functor() -> Functor(PairF(a), b, c, Pair(a, b), Pair(a, c)) {
 /// either_functor().fmap(bool.negate)(Right(False))
 /// // -> Right(True)
 /// ```
-pub fn either_functor() -> Functor(EitherF(a), b, c, Either(a, b), Either(a, c)) {
-  Functor(fmap: fn(f: fn(b) -> c) -> fn(Either(a, b)) -> Either(a, c) {
+pub fn either_functor() -> Functor(EitherF(e), a, b, Either(e, a), Either(e, b)) {
+  Functor(fmap: fn(f: fn(a) -> b) -> fn(Either(e, a)) -> Either(e, b) {
     fn(e) {
       case e {
         Left(x) -> Left(x)
@@ -152,9 +152,9 @@ pub fn either_functor() -> Functor(EitherF(a), b, c, Either(a, b), Either(a, c))
 /// triple_functor().fmap(bool.negate)(#("abc", 9, False))
 /// // -> #("abc", 9, True)
 /// ```
-pub fn triple_functor() -> Functor(TripleF(a, b), c, d, #(a, b, c), #(a, b, d)) {
-  Functor(fmap: fn(f: fn(c) -> d) -> fn(#(a, b, c)) -> #(a, b, d) {
-    fn(p: #(a, b, c)) { #(p.0, p.1, f(p.2)) }
+pub fn triple_functor() -> Functor(TripleF(c, d), a, b, #(c, d, a), #(c, d, b)) {
+  Functor(fmap: fn(f: fn(a) -> b) -> fn(#(c, d, a)) -> #(c, d, b) {
+    fn(p: #(c, d, a)) { #(p.0, p.1, f(p.2)) }
   })
 }
 

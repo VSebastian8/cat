@@ -2,6 +2,7 @@
 //// Functions: composition, identity, unit, constant, flip, curry, uncurry. \
 //// Types: Void, option (Maybe), product (Pair), coproduct (Either), Identity, and Const.
 
+import gleam/int
 import gleam/option.{type Option, None, Some}
 
 /// The `identity function` is a `unit of composition`.
@@ -426,4 +427,45 @@ pub fn uncurry(g: fn(a) -> fn(b) -> c) -> fn(a, b) -> c {
 /// ```
 pub type Op(r, a) {
   Op(apply: fn(a) -> r)
+}
+
+pub type Wrapper(a) {
+  Wrapper(a)
+}
+
+fn f() -> Wrapper(Int) {
+  Wrapper(3)
+}
+
+fn g(y: Int) -> Wrapper(Bool) {
+  Wrapper(y % 2 == 0)
+}
+
+fn return(x: a) -> Wrapper(a) {
+  Wrapper(x)
+}
+
+fn bind(w: Wrapper(a)) -> fn(fn(a) -> Wrapper(b)) -> Wrapper(b) {
+  fn(fw) {
+    let Wrapper(x) = w
+    fw(x)
+  }
+}
+
+pub fn with_use() -> Wrapper(Bool) {
+  use x <- { bind(f()) }
+  use y <- { x |> g |> bind() }
+  y |> return
+}
+
+pub fn with_use_2() -> String {
+  use x <- fn(f: fn(Int) -> String) { f(2) }
+  echo x
+  int.to_string(x)
+}
+
+pub fn main() -> Nil {
+  echo with_use()
+  echo with_use_2()
+  Nil
 }
