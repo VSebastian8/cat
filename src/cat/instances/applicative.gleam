@@ -1,4 +1,4 @@
-//// `Applicative` instances: Option, List, Reader, Writer.
+//// `Applicative` instances: Identity, Option, List, Const, Tuple, Pair, Either, Triple Writer, Reader, Function.
 
 import cat.{
   type Const, type Either, type Identity, type Pair, type Reader, type Writer,
@@ -20,6 +20,20 @@ import gleam/list
 import gleam/option.{type Option, None, Some}
 
 /// Applicative instance for `Identity`.
+/// ### Examples
+/// ```gleam
+/// let identity_f =
+///   fn(x: Int, y: String) { int.to_string(x) <> y }
+///   |> curry()
+///   |> identity_applicative().pure()
+///
+/// identity_applicative().apply(
+///   identity_applicative().apply
+///      (identity_f)
+///      (Identity(6))
+/// )(Identity(" apples"))
+/// // -> Identity("6 apples")
+/// ```
 pub fn identity_applicative() -> Applicative(
   IdentityF,
   a,
@@ -109,6 +123,14 @@ pub fn list_applicative() -> Applicative(
 }
 
 /// Applicative instance for `Const` given `Monoid` instance.
+/// ### Examples
+/// ```gleam
+/// {
+///   const_monoid_applicative(all_monoid()).pure(fn(x) { x * 2 }) // True
+///   |> const_monoid_applicative(any_monoid()).apply // ||
+/// }(const_monoid_applicative(all_monoid()).pure(7)) // False
+/// // -> Const(True)
+/// ```
 pub fn const_monoid_applicative(
   mono: Monoid(m),
 ) -> Applicative(
@@ -133,6 +155,19 @@ pub fn const_monoid_applicative(
 }
 
 /// Applicative instance for `Tuple` given `Monoid` instance.
+/// ### Examples
+/// ```gleam
+/// let sum = int_sum_monoid()
+/// {
+///   {
+///     fn(x) { fn(y) { x * 10 + y } }
+///     |> tuple_monoid_applicative(sum).pure()
+///     |> tuple_monoid_applicative(sum).apply()
+///   }(#(3, 7))
+///   |> tuple_monoid_applicative(sum).apply()
+/// }(#(2, 4))
+/// // -> #(5, 74)
+/// ```
 pub fn tuple_monoid_applicative(
   mono: Monoid(m),
 ) -> Applicative(TupleF(m), a, b, #(m, a), #(m, b), #(m, fn(a) -> b)) {
@@ -146,6 +181,19 @@ pub fn tuple_monoid_applicative(
 }
 
 /// Applicative instance for `Pair` given `Monoid` instance.
+/// ### Examples
+/// ```gleam
+/// let prod = int_prod_monoid()
+/// {
+///   {
+///     fn(x) { fn(y) { x * 10 + y } }
+///     |> pair_monoid_applicative(prod).pure()
+///     |> pair_monoid_applicative(prod).apply()
+///   }(Pair(3, 9))
+///   |> pair_monoid_applicative(prod).apply()
+/// }(Pair(4, 1))
+/// // -> Pair(12, 91)
+/// ```
 pub fn pair_monoid_applicative(
   mono: Monoid(m),
 ) -> Applicative(PairF(m), a, b, Pair(m, a), Pair(m, b), Pair(m, fn(a) -> b)) {
@@ -163,6 +211,18 @@ pub fn pair_monoid_applicative(
 }
 
 /// Applicative instance for `Either`.
+/// ### Examples
+/// ```gleam
+/// let e_plus =
+///   fn(x) { x + 2 }
+///   |> either_applicative().pure()
+///   |> either_applicative().apply()
+/// 
+/// e_plus(Left("Unexpected"))
+/// // -> Left("Unexpected")
+/// e_plus(Right(1))
+/// // -> Right(3)
+/// ```
 pub fn either_applicative() -> Applicative(
   EitherF(e),
   a,
@@ -182,6 +242,20 @@ pub fn either_applicative() -> Applicative(
 }
 
 /// Applicative instance for `Triple` given 2 `Monoid` instances.
+/// ### Examples
+/// ```gleam
+/// let sum = int_sum_monoid()
+/// let prod = int_prod_monoid()
+/// let triple_plus =
+///   fn(x) { fn(y) { x + y } }
+///   |> triple_monoid_applicative(sum, prod).pure()
+///   |> triple_monoid_applicative(sum, prod).apply()
+/// // Final instance for binding the generic types:
+/// let triple = triple_monoid_applicative(sum, prod)
+/// // Applicative function chain:
+/// triple.apply(triple_plus(#(3, 3, 20)))(#(4, 4, 15))
+/// // -> #(7, 12, 35)
+/// ```
 pub fn triple_monoid_applicative(
   mono1: Monoid(c),
   mono2: Monoid(d),
@@ -207,6 +281,15 @@ pub fn triple_monoid_applicative(
 }
 
 /// Applicative instance for `Writer`.
+/// ### Examples
+/// ```gleam
+/// let log_plus =
+///   Writer(fn(x) { x + 2 }, "[plus two]")
+///   |> writer_applicative().apply()
+/// 
+/// log_plus(Writer(7, " seven"))
+/// // -> Writer(9, "[plus two] seven")
+/// ```
 pub fn writer_applicative() -> Applicative(
   WriterF,
   a,
@@ -229,6 +312,15 @@ pub fn writer_applicative() -> Applicative(
 }
 
 /// Applicative instance for `Reader`.
+/// ### Examples
+/// ```gleam
+/// let rff = Reader(fn(x) { fn(y) { x * y } })
+/// let rf = Reader(fn(x) { x + 5 })
+/// let rg = reader_applicative().apply(rff)(rf)
+/// 
+/// rg.apply(2) // 2 * (2 + 5)
+/// // -> 14
+/// ```
 pub fn reader_applicative() -> Applicative(
   ReaderF(r),
   a,
@@ -249,6 +341,15 @@ pub fn reader_applicative() -> Applicative(
 }
 
 /// Applicative instance for `(->)`.
+/// ### Examples
+/// ```gleam
+/// let ff = fn(x) { fn(y) { x * y } }
+/// let f = fn(x) { x + 5 }
+/// let g = function_applicative().apply(ff)(f)
+/// 
+/// g(2) // 2 * (2 + 5)
+/// // -> 14
+/// ```
 pub fn function_applicative() -> Applicative(
   FunctionF(r),
   a,

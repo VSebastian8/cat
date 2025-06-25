@@ -33,6 +33,13 @@ pub type Monoid(m) {
 
 // Separate function because gleam doesn't allow default implementations for record fields
 /// Fold a `list of monoids` using mappend. 
+/// ### Examples
+/// ```gleam
+/// int_prod_monoid
+/// |> mconcat([2, 3, int_prod_monoid.mempty, 4, int_prod_monoid.mempty])
+/// |> int_prod_monoid.mappend(10)
+/// // -> 240
+/// ```
 pub fn mconcat(mono: Monoid(m), monoid_list: List(m)) -> m {
   monoid_list |> list.fold(mono.mempty, mono.mappend)
 }

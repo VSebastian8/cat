@@ -42,6 +42,30 @@ pub fn any_monoid() -> Monoid(Bool) {
   Monoid(mempty: False, mappend: bool.or)
 }
 
+/// Monoid instance for integer sum.
+/// ### Examples
+/// ```gleam
+/// int_sum_monoid().mappend(7, 8)
+/// // -> 15
+/// int_sum_monoid().mappend(4, int_sum_monoid().mempty)
+/// // -> 4
+/// ```
+pub fn int_sum_monoid() -> Monoid(Int) {
+  Monoid(mempty: 0, mappend: fn(x: Int, y: Int) { x + y })
+}
+
+/// Monoid instance for integer product.
+/// ### Examples
+/// ```gleam
+/// int_prod_monoid()
+/// |> mconcat([2, 3, int_prod_monoid().mempty, 4, int_prod_monoid().mempty])
+/// |> int_prod_monoid().mappend(10)
+/// // -> 240
+/// ```
+pub fn int_prod_monoid() -> Monoid(Int) {
+  Monoid(mempty: 1, mappend: fn(x: Int, y: Int) { x * y })
+}
+
 /// Returns the `canonical implementation` of the `monoid type for List`.
 /// ### Examples
 /// ```gleam
