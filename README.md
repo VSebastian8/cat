@@ -4,6 +4,7 @@
 [![Hex Docs](https://img.shields.io/badge/hex-docs-ffaff3)](https://hexdocs.pm/cat)
 
 This package implements several category theory concepts, following [this book](https://bartoszmilewski.com/2014/10/28/category-theory-for-programmers-the-preface/) by Bartosz Milewski.
+// More description
 
 ```sh
 gleam add cat
@@ -121,10 +122,3 @@ pub fn main() {
 ```
 
 Further documentation can be found at <https://hexdocs.pm/cat>.
-
-## Development
-
-```sh
-gleam run   # Run the project
-gleam test  # Run the tests
-```
