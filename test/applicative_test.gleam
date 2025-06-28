@@ -108,16 +108,6 @@ pub fn option_app_test() {
   option.Some(12) |> option_f |> should.equal(option.Some("12"))
 }
 
-/// Testing the list applicative instance.
-pub fn list_app_test() {
-  [1, 2, 3]
-  |> {
-    [fn(x) { x * 2 }, fn(x) { x + 10 }]
-    |> app.list_applicative().apply
-  }
-  |> should.equal([2, 4, 6, 11, 12, 13])
-}
-
 /// Testing applicative of functor.
 pub fn option_list_test() {
   [option.Some(1), option.None, option.Some(3)]
@@ -134,6 +124,27 @@ pub fn option_list_test() {
     option.None,
     option.Some(13),
   ])
+}
+
+/// Testing the result applicative instance.
+pub fn result_app_test() {
+  let resf =
+    app.result_applicative().pure(fn(x) { x * 10 })
+    |> app.result_applicative().apply
+  resf(Ok(7))
+  |> should.equal(Ok(70))
+  resf(Error("Not a number"))
+  |> should.equal(Error("Not a number"))
+}
+
+/// Testing the list applicative instance.
+pub fn list_app_test() {
+  [1, 2, 3]
+  |> {
+    [fn(x) { x * 2 }, fn(x) { x + 10 }]
+    |> app.list_applicative().apply
+  }
+  |> should.equal([2, 4, 6, 11, 12, 13])
 }
 
 // Testing the const monoid => applicative instance.

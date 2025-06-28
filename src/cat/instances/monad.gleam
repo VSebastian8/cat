@@ -2,11 +2,13 @@
 
 import cat.{type Identity, type Reader, type Writer, Identity, Reader, Writer}
 import cat/instances/types.{
-  type IdentityF, type ListF, type OptionF, type ReaderF, type WriterF,
+  type IdentityF, type ListF, type OptionF, type ReaderF, type ResultF,
+  type WriterF,
 }
 import cat/monad.{type Monad, Monad, new}
 import gleam/list
 import gleam/option.{type Option, None, Some}
+import gleam/result
 
 /// Monad instance for `Identity`.
 /// ### Examples
@@ -99,6 +101,37 @@ pub fn option_monad() -> Monad(OptionF, a, b, Option(a), Option(b)) {
 /// ```
 pub fn list_monad() -> Monad(ListF, a, b, List(a), List(b)) {
   Monad(return: fn(x) { [x] }, bind: list.flat_map, map: list.map)
+}
+
+/// Monad instance for `Result`.
+/// ### Examples
+/// ```gleam
+/// let rm = result_monad()
+/// {
+///   use x <- rm.bind(Ok(2))
+///   use y <- rm.map(Ok(3))
+///   x + y
+/// }
+/// ```
+/// ```gleam
+/// // -> Ok(5)
+/// {
+///   use x <- rm.bind(Error("Nan"))
+///   use y <- rm.map(Ok(3))
+///   x + y
+/// }
+/// ```
+/// ```gleam
+/// // -> Error("Nan")
+/// {
+///   use x <- rm.bind(Ok(2))
+///   use y <- rm.map(Error("Nan"))
+///   x + y
+/// }
+/// // -> Error("Nan")
+/// ```
+pub fn result_monad() -> Monad(ResultF(e), a, b, Result(a, e), Result(b, e)) {
+  Monad(return: fn(x) { Ok(x) }, bind: result.try, map: result.map)
 }
 
 /// Monad instance for `Writer`.

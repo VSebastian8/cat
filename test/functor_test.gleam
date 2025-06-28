@@ -73,6 +73,15 @@ pub fn option_functor_test() {
   |> should.equal(option.Some(4))
 }
 
+// Testing the result functor instance
+pub fn result_functor_test() {
+  fun.result_functor().fmap(int.to_string)(Ok(72))
+  |> should.equal(Ok("72"))
+
+  fun.result_functor().fmap(int.to_string)(Error("Not a number"))
+  |> should.equal(Error("Not a number"))
+}
+
 /// Testing the list functor instance.
 pub fn list_functor_test() {
   fun.list_functor().fmap(int.to_string)([1, 3, 4])

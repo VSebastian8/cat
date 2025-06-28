@@ -8,6 +8,9 @@ pub type ConstF(c)
 /// Phantom type for `Option Functor`.
 pub type OptionF
 
+/// Phantom type for `Result Functor`.
+pub type ResultF(a)
+
 /// Phantom type for `List Functor`.
 pub type ListF
 

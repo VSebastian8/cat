@@ -7,8 +7,8 @@ import cat.{
 import cat/functor.{type Functor, Functor}
 import cat/instances/types.{
   type ConstF, type EitherF, type FunctionF, type IdentityF, type ListF,
-  type OptionF, type PairF, type ReaderF, type TripleF, type TupleF,
-  type WriterF,
+  type OptionF, type PairF, type ReaderF, type ResultF, type TripleF,
+  type TupleF, type WriterF,
 }
 import gleam/option.{type Option, None, Some}
 
@@ -62,6 +62,25 @@ pub fn option_functor() -> Functor(OptionF, a, b, Option(a), Option(b)) {
   })
 }
 
+/// `Result Functor Instance`.
+/// ### Examples
+/// ```gleam
+/// result_functor().fmap(int.to_string)(Ok(72))
+/// // -> Ok("72")
+/// result_functor().fmap(int.to_string)(Error("Not a number"))
+/// // -> Error("Not a number")
+/// ```
+pub fn result_functor() -> Functor(ResultF(e), a, b, Result(a, e), Result(b, e)) {
+  Functor(fmap: fn(f) {
+    fn(res) {
+      case res {
+        Error(err) -> Error(err)
+        Ok(x) -> Ok(f(x))
+      }
+    }
+  })
+}
+
 /// `fmap` for List Functor.
 fn list_fmap(f: fn(a) -> b) -> fn(List(a)) -> List(b) {
   fn(l) {
@@ -80,6 +99,11 @@ fn list_fmap(f: fn(a) -> b) -> fn(List(a)) -> List(b) {
 ///     fmap _ [] = []
 ///     fmap f (x:xs) = (f x):(fmap f xs)
 /// ```
+/// ### Examples
+/// ```gleam
+/// list_functor().fmap(int.to_string)([1, 3, 4])
+/// // -> ["1", "3", "4"]
+/// ```
 pub fn list_functor() -> Functor(ListF, a, b, List(a), List(b)) {
   Functor(fmap: list_fmap)
 }
@@ -90,6 +114,11 @@ pub fn list_functor() -> Functor(ListF, a, b, List(a), List(b)) {
 /// instance Functor (Const c) where
 ///     fmap :: (a -> b) -> Const c a -> Const c b
 ///     fmap _ (Const v) = Const v  
+/// ```
+/// ### Examples
+/// ```gleam
+/// const_functor().fmap(int.to_string)(Const(True))
+/// // -> Const(True)
 /// ```
 pub fn const_functor() -> Functor(ConstF(c), a, b, Const(c, a), Const(c, b)) {
   Functor(fmap: fn(_: fn(a) -> b) -> fn(Const(c, a)) -> Const(c, b) {

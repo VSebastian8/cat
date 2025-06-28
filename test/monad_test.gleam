@@ -1,5 +1,7 @@
 import cat.{Identity}
-import cat/instances/monad.{identity_monad, list_monad, option_monad}
+import cat/instances/monad.{
+  identity_monad, list_monad, option_monad, result_monad,
+}
 import gleam/int
 import gleam/option.{None, Some}
 import gleeunit/should
@@ -53,4 +55,27 @@ pub fn list_monad_test() {
     lm.return(x * y)
   }
   |> should.equal([4, 5, 8, 10, 12, 15])
+}
+
+// Testing the result monad instance.
+pub fn result_monad_test() {
+  let rm = result_monad()
+  {
+    use x <- rm.bind(Ok(2))
+    use y <- rm.map(Ok(3))
+    x + y
+  }
+  |> should.equal(Ok(5))
+  {
+    use x <- rm.bind(Error("Nan"))
+    use y <- rm.map(Ok(3))
+    x + y
+  }
+  |> should.equal(Error("Nan"))
+  {
+    use x <- rm.bind(Ok(2))
+    use y <- rm.map(Error("Nan"))
+    x + y
+  }
+  |> should.equal(Error("Nan"))
 }

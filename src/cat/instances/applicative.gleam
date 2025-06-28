@@ -7,13 +7,13 @@ import cat.{
 import cat/applicative.{type Applicative, Applicative}
 import cat/instances/functor.{
   const_functor, either_functor, function_functor, identity_functor,
-  list_functor, option_functor, pair_functor, reader_functor, triple_functor,
-  tuple_functor, writer_functor,
+  list_functor, option_functor, pair_functor, reader_functor, result_functor,
+  triple_functor, tuple_functor, writer_functor,
 }
 import cat/instances/types.{
   type ConstF, type EitherF, type FunctionF, type IdentityF, type ListF,
-  type OptionF, type PairF, type ReaderF, type TripleF, type TupleF,
-  type WriterF,
+  type OptionF, type PairF, type ReaderF, type ResultF, type TripleF,
+  type TupleF, type WriterF,
 }
 import cat/monoid.{type Monoid}
 import gleam/list
@@ -88,6 +88,39 @@ pub fn option_applicative() -> Applicative(
     case m {
       None -> fn(_) { None }
       Some(f) -> option_functor().fmap(f)
+    }
+  })
+}
+
+/// `Applicative instance` for `Result`.
+/// ### Examples
+/// ```gleam
+/// let resf =
+///   result_applicative().pure(fn(x) { x * 10 })
+///   |> result_applicative().apply
+/// resf(Ok(7))
+/// // -> Ok(70)
+/// resf(Error("Not a number"))
+/// // -> Error("Not a number")
+/// ```
+pub fn result_applicative() -> Applicative(
+  ResultF(e),
+  a,
+  b,
+  Result(a, e),
+  Result(b, e),
+  Result(fn(a) -> b, e),
+) {
+  Applicative(result_functor(), pure: fn(x) { Ok(x) }, apply: fn(rf) {
+    fn(rx) {
+      case rf {
+        Error(err) -> Error(err)
+        Ok(f) ->
+          case rx {
+            Error(err) -> Error(err)
+            Ok(x) -> Ok(f(x))
+          }
+      }
     }
   })
 }
