@@ -1,6 +1,7 @@
-import cat.{Identity}
+import cat.{Identity, Reader, Writer}
 import cat/instances/monad.{
-  identity_monad, list_monad, option_monad, result_monad,
+  function_monad, identity_monad, list_monad, option_monad, reader_monad,
+  result_monad, writer_monad,
 }
 import gleam/int
 import gleam/option.{None, Some}
@@ -78,4 +79,38 @@ pub fn result_monad_test() {
     x + y
   }
   |> should.equal(Error("Nan"))
+}
+
+// Testing the writer monad instance.
+pub fn writer_monad_test() {
+  {
+    use x <- writer_monad().bind(Writer(2, "two + "))
+    use y <- writer_monad().map(Writer(3, "three"))
+    x + y
+  }
+  |> should.equal(Writer(5, "two + three"))
+}
+
+// Testing the reader monad instance
+pub fn reader_monad_test() {
+  let r = {
+    use t1 <- reader_monad().bind(Reader(fn(x) { x % 2 == 0 }))
+    use t2 <- reader_monad().map(Reader(fn(x) { x % 3 == 0 }))
+    t1 || t2
+  }
+  r.apply(5)
+  |> should.equal(False)
+  r.apply(6)
+  |> should.equal(True)
+}
+
+// Testing the function monad instance
+pub fn function_monad_test() {
+  let h = {
+    use f <- function_monad().bind(fn(x) { fn(y) { x * y } })
+    use x <- function_monad().map(fn(x) { x + 5 })
+    f(x)
+  }
+  h(2)
+  |> should.equal(14)
 }

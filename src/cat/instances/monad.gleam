@@ -2,8 +2,8 @@
 
 import cat.{type Identity, type Reader, type Writer, Identity, Reader, Writer}
 import cat/instances/types.{
-  type IdentityF, type ListF, type OptionF, type ReaderF, type ResultF,
-  type WriterF,
+  type FunctionF, type IdentityF, type ListF, type OptionF, type ReaderF,
+  type ResultF, type WriterF,
 }
 import cat/monad.{type Monad, Monad, new}
 import gleam/list
@@ -142,6 +142,15 @@ pub fn result_monad() -> Monad(ResultF(e), a, b, Result(a, e), Result(b, e)) {
 ///       (vb, log2) = runWriter (k va)
 ///   in  Writer (vb, log1 ++ log2)
 /// ```
+/// ### Examples
+/// ```gleam
+/// {
+///   use x <- writer_monad().bind(Writer(2, "two + "))
+///   use y <- writer_monad().map(Writer(3, "three"))
+///   x + y
+/// }
+/// // -> Writer(5, "two + three")
+/// ```
 pub fn writer_monad() -> Monad(WriterF, a, b, Writer(a), Writer(b)) {
   Monad(
     return: fn(x) { Writer(x, "") },
@@ -161,7 +170,19 @@ pub fn writer_monad() -> Monad(WriterF, a, b, Writer(a), Writer(b)) {
 /// ```
 /// instance Monad ((->) r) where
 ///   f >>= k = \ r -> k (f r) r
-///```
+/// ```
+/// ### Examples
+/// ```gleam
+/// let r = {
+///   use t1 <- reader_monad().bind(Reader(fn(x) { x % 2 == 0 }))
+///   use t2 <- reader_monad().map(Reader(fn(x) { x % 3 == 0 }))
+///   t1 || t2
+/// }
+/// r.apply(5)
+/// // -> False
+/// r.apply(6)
+/// // -> True
+/// ```
 pub fn reader_monad() -> Monad(ReaderF(r), a, b, Reader(r, a), Reader(r, b)) {
   new(
     fn(x) { Reader(cat.constant(x)) },
@@ -169,5 +190,24 @@ pub fn reader_monad() -> Monad(ReaderF(r), a, b, Reader(r, a), Reader(r, b)) {
     bind: fn(ra: Reader(r, a), f: fn(a) -> Reader(r, b)) {
       Reader(apply: fn(x) { f(ra.apply(x)).apply(x) })
     },
+  )
+}
+
+/// Monad instance for `(->)`.
+/// ### Examples
+/// ```gleam
+/// let h = {
+///   use f <- function_monad().bind(fn(x) { fn(y) { x * y } })
+///   use x <- function_monad().map(fn(x) { x + 5 })
+///   f(x)
+/// }
+/// h(2)
+/// // -> 14
+/// ```
+pub fn function_monad() -> Monad(FunctionF(r), a, b, fn(r) -> a, fn(r) -> b) {
+  Monad(
+    return: fn(x) { fn(_) { x } },
+    bind: fn(ra, f) { fn(x) { f(ra(x))(x) } },
+    map: fn(ra, f) { fn(x) { f(ra(x)) } },
   )
 }
