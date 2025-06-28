@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.0.0 - 2025-06-28
+
+- Extensively `tested` and `documented` code (`1500 comments`)
+- Rich `generic` library (`2000 lines of code`)
+- Added multiple Monad `instances`
+- Reworked `Monad` type for working in `use expressions`
+
 ## v0.5.1 - 2025-06-22
 
 - Reworked how `superclass constraint` is mimicked
