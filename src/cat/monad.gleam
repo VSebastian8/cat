@@ -8,6 +8,24 @@ import cat/functor.{type Functor, Functor}
 ///   (>>=) :: m a -> (a -> m b) -> m b
 /// ```
 /// This type contains the Functor `map` function which can be calculated by default through the new function.
+/// Just like Haskell's `do notation`, Gleam has `use expressions` that act as syntactic sugar:
+/// ```
+/// // Haskell
+/// sum :: Maybe Int
+/// sum = do
+///   x <- Just 1
+///   y <- Just 2 
+///   return x + y
+/// ``` 
+/// ```gleam
+/// 
+/// // Gleam
+/// fn sum() -> Option(Int) {
+///   use x <- option_monad().bind(Some(1))
+///   use y <- option_monad().bind(Some(2))
+///   option_monad().return(x + y)
+/// }
+/// ```
 pub type Monad(m, a, b, ma, mb) {
   Monad(
     return: fn(a) -> ma,
