@@ -65,4 +65,4 @@ pub type OpC(r)
 pub type ArrowPro
 
 /// Phantom type for the `state monad`.
-pub type StateM
+pub type StateM(s)

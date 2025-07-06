@@ -1,7 +1,7 @@
-import cat.{Identity, Reader, Writer}
+import cat.{Identity, Reader, State, Writer}
 import cat/instances/monad.{
   function_monad, identity_monad, list_monad, option_monad, reader_monad,
-  result_monad, writer_monad,
+  result_monad, state_monad, writer_monad,
 }
 import gleam/int
 import gleam/option.{None, Some}
@@ -91,7 +91,7 @@ pub fn writer_monad_test() {
   |> should.equal(Writer(5, "two + three"))
 }
 
-// Testing the reader monad instance
+// Testing the reader monad instance.
 pub fn reader_monad_test() {
   let r = {
     use t1 <- reader_monad().bind(Reader(fn(x) { x % 2 == 0 }))
@@ -104,7 +104,7 @@ pub fn reader_monad_test() {
   |> should.equal(True)
 }
 
-// Testing the function monad instance
+// Testing the function monad instance.
 pub fn function_monad_test() {
   let h = {
     use f <- function_monad().bind(fn(x) { fn(y) { x * y } })
@@ -113,4 +113,20 @@ pub fn function_monad_test() {
   }
   h(2)
   |> should.equal(14)
+}
+
+// Testing the state monad instance.
+pub fn state_monad_test() {
+  let count = State(fn(x) { #(x, x + 1) })
+  {
+    use x <- state_monad().bind(count)
+    // 1
+    use y <- state_monad().bind(count)
+    // 2
+    use z <- state_monad().map(count)
+    // 3
+    x + y + z
+    // 1 + 2 + 3
+  }.run(1)
+  |> should.equal(#(6, 4))
 }

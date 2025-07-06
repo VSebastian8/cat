@@ -1,9 +1,12 @@
 //// Monad instances: Writer, Reader.
 
-import cat.{type Identity, type Reader, type Writer, Identity, Reader, Writer}
+import cat.{
+  type Identity, type Reader, type State, type Writer, Identity, Reader, State,
+  Writer,
+}
 import cat/instances/types.{
   type FunctionF, type IdentityF, type ListF, type OptionF, type ReaderF,
-  type ResultF, type WriterF,
+  type ResultF, type StateM, type WriterF,
 }
 import cat/monad.{type Monad, Monad, new}
 import gleam/list
@@ -112,17 +115,17 @@ pub fn list_monad() -> Monad(ListF, a, b, List(a), List(b)) {
 ///   use y <- rm.map(Ok(3))
 ///   x + y
 /// }
+/// // -> Ok(5)
 /// ```
 /// ```gleam
-/// // -> Ok(5)
 /// {
 ///   use x <- rm.bind(Error("Nan"))
 ///   use y <- rm.map(Ok(3))
 ///   x + y
 /// }
+/// // -> Error("Nan")
 /// ```
 /// ```gleam
-/// // -> Error("Nan")
 /// {
 ///   use x <- rm.bind(Ok(2))
 ///   use y <- rm.map(Error("Nan"))
@@ -209,5 +212,35 @@ pub fn function_monad() -> Monad(FunctionF(r), a, b, fn(r) -> a, fn(r) -> b) {
     return: fn(x) { fn(_) { x } },
     bind: fn(ra, f) { fn(x) { f(ra(x))(x) } },
     map: fn(ra, f) { fn(x) { f(ra(x)) } },
+  )
+}
+
+/// `State` monad.
+/// ### Examples
+/// ```gleam
+/// let count = State(fn(x) { #(x, x + 1) })
+/// {
+///   use x <- state_monad().bind(count) // 1
+///   use y <- state_monad().bind(count) // 2
+///   use z <- state_monad().map(count)  // 3
+///   x + y + z                          // 1 + 2 + 3
+/// }.run(1)
+/// // -> #(6, 4)
+/// ```
+pub fn state_monad() -> Monad(StateM(s), a, b, State(s, a), State(s, b)) {
+  Monad(
+    return: fn(x) { State(fn(st) { #(x, st) }) },
+    bind: fn(state, f: fn(a) -> State(s, b)) {
+      State(run: fn(st) {
+        let #(x, st2) = state.run(st)
+        f(x).run(st2)
+      })
+    },
+    map: fn(state, f: fn(a) -> b) {
+      State(run: fn(st) {
+        let #(x, st2) = state.run(st)
+        #(f(x), st2)
+      })
+    },
   )
 }

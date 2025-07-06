@@ -1,4 +1,6 @@
-import cat/instances/monad.{list_monad as lsm, option_monad as opt}
+import cat/instances/monad.{
+  list_monad as lsm, option_monad as opt, state_monad as st,
+}
 import gleam/int
 import gleam/option.{None, Some}
 import gleeunit/should
@@ -57,7 +59,7 @@ pub fn func_app_test() -> Nil {
   |> should.equal([Some(2), None, Some(6), Some(11), None, Some(13)])
 }
 
-import cat.{type Either, Left, Right}
+import cat.{type Either, type State, Left, Right, State}
 import cat/monoid as mono
 
 pub fn mono_test() -> Nil {
@@ -119,4 +121,36 @@ pub fn bif_test() {
   cat.Right(cat.Identity(3))
   |> maybe_functor().bimap(fn(_) { panic }, int.to_string)
   |> should.equal(cat.Right(cat.Identity("3")))
+}
+
+// Custom binary tree type
+pub type Tree(a) {
+  Leaf(val: a)
+  Node(left: Tree(a), right: Tree(a))
+}
+
+// Get a new id
+pub fn fresh() -> State(Int, Int) {
+  State(run: fn(x) { #(x, x + 10) })
+}
+
+// Label a tree with new ids
+pub fn label(t: Tree(a)) -> State(Int, Tree(Int)) {
+  case t {
+    Leaf(_) -> {
+      use x <- st().bind(fresh())
+      st().return(Leaf(x))
+    }
+    Node(left, right) -> {
+      use left2 <- st().bind(label(left))
+      use right2 <- st().map(label(right))
+      Node(left2, right2)
+    }
+  }
+}
+
+pub fn state_test() {
+  let tree = Node(Node(Leaf("a"), Leaf("b")), Leaf("c"))
+  label(tree).run(5).0
+  |> should.equal(Node(Node(Leaf(5), Leaf(15)), Leaf(25)))
 }

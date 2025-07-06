@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.1.0 - 2025-07-06
+
+- `State Monad`
+
 ## v1.0.0 - 2025-06-28
 
 - Extensively `tested` and `documented` code (`1500 comments`)

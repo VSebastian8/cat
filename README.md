@@ -40,7 +40,6 @@ pub fn main() -> Nil {
 ```gleam
 import cat/instances/monad.{list_monad as lsm}
 import gleam/int
-import gleam/option.{None, Some}
 
 pub fn main() -> Nil {
   let grocery_list = {
@@ -50,6 +49,45 @@ pub fn main() -> Nil {
   }
   echo grocery_list
   // -> ["20 apples", "20 oranges", "30 apples", "30 oranges", "40 apples", "40 oranges"]
+  Nil
+}
+```
+
+```gleam
+import cat.{type State, State}
+import cat/instances/monad.{state_monad as st}
+
+// Custom binary tree type
+pub type Tree(a) {
+  Leaf(val: a)
+  Node(left: Tree(a), right: Tree(a))
+}
+
+// Get a new id
+pub fn fresh() -> State(Int, Int) {
+  State(run: fn(x) { #(x, x + 10) })
+}
+
+// Label a tree with new ids
+pub fn label(t: Tree(a)) -> State(Int, Tree(Int)) {
+  case t {
+    Leaf(_) -> {
+      use x <- st().bind(fresh())
+      st().return(Leaf(x))
+    }
+    Node(left, right) -> {
+      use left2 <- st().bind(label(left))
+      use right2 <- st().map(label(right))
+      Node(left2, right2)
+    }
+  }
+}
+
+pub fn main() -> Nil {
+  let tree = Node(Node(Leaf("a"), Leaf("b")), Leaf("c"))
+  // Relabel this tree using the state monad
+  echo label(tree).run(5).0
+  // -> Node(Node(Leaf(5), Leaf(15)), Leaf(25))
   Nil
 }
 ```
