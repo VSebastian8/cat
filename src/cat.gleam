@@ -427,3 +427,15 @@ pub fn uncurry(g: fn(a) -> fn(b) -> c) -> fn(a, b) -> c {
 pub type Op(r, a) {
   Op(apply: fn(a) -> r)
 }
+
+/// State type.
+/// ### Examples
+/// ```gleam
+/// let count: State(Int, Int) = State(fn(c) { #(c, c + 1) })
+/// let current = 4
+/// count.run(current)
+/// // -> #(4, 5)
+/// ```
+pub type State(s, a) {
+  State(run: fn(s) -> #(a, s))
+}

@@ -63,3 +63,6 @@ pub type OpC(r)
 
 /// Phantom type for the `function profunctor`.
 pub type ArrowPro
+
+/// Phantom type for the `state monad`.
+pub type StateM
