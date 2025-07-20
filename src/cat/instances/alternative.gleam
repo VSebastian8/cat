@@ -1,5 +1,7 @@
 import cat/alternative.{type Alternative, Alternative}
+import cat/functor.{type Functor}
 import cat/instances/types.{type ListF, type OptionF, type ResultF}
+import cat/monoid.{type Monoid}
 import gleam/option.{type Option, None, Some}
 
 /// Alternative instance for `Option`.
@@ -81,4 +83,20 @@ pub fn result_alternative(error: e) -> Alternative(ResultF(e), Result(a, e)) {
       _ -> x
     }
   })
+}
+
+/// Alternative instance for `Monoid` + `Functor`.
+/// ### Examples
+/// ```gleam
+/// let inst = monoid_functor_alternative(list_monoid(), list_functor())
+/// inst.or(inst.empty, [1, 2, 3])
+/// // -> [1, 2, 3]
+/// inst.or([1, 2], [3, 4, 5])
+/// // -> [1, 2, 3, 4, 5]
+/// ```
+pub fn monoid_functor_alternative(
+  mono: Monoid(fa),
+  _: Functor(f, a, b, fa, fb),
+) -> Alternative(f, fa) {
+  Alternative(empty: mono.mempty, or: mono.mappend)
 }
