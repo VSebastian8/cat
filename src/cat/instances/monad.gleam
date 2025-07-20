@@ -22,6 +22,8 @@ import gleam/result
 ///   identity_monad().return(x <> int.to_string(y))
 /// }
 /// // -> Identity("res: 7")
+/// ```
+/// ```gleam
 /// // Or without use expressions:
 /// identity_monad().bind(Identity("res: "), fn(x) {
 ///   identity_monad().bind(Identity(7), fn(y) {
@@ -110,6 +112,8 @@ pub fn list_monad() -> Monad(ListF, a, b, List(a), List(b)) {
 /// ### Examples
 /// ```gleam
 /// let rm = result_monad()
+/// ```
+/// ```gleam
 /// {
 ///   use x <- rm.bind(Ok(2))
 ///   use y <- rm.map(Ok(3))
