@@ -1,4 +1,4 @@
-//// Monad instances: Writer, Reader.
+//// Monad instances: Identity, Option, List, Result, Writer, Reader, State.
 
 import cat.{
   type Identity, type Reader, type State, type Writer, Identity, Reader, State,
