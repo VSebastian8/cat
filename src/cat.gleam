@@ -439,3 +439,60 @@ pub type Op(r, a) {
 pub type State(s, a) {
   State(run: fn(s) -> #(a, s))
 }
+
+/// Encapsulates a list with at least one element.
+/// ### Examples
+/// ```gleam
+/// let r = Reader(fn(x) { x % 2 == 1 })
+/// r.apply(6)
+/// // -> False
+/// ```
+pub type NonEmpty(a) {
+  Leaf(a)
+  Next(a, NonEmpty(a))
+}
+
+/// Returns the first element of a non-empty list.
+pub fn head(v: NonEmpty(a)) -> a {
+  case v {
+    Leaf(x) -> x
+    Next(x, _) -> x
+  }
+}
+
+/// Returns the tail if there is one.
+pub fn tail(v: NonEmpty(a)) -> Option(NonEmpty(a)) {
+  case v {
+    Leaf(_) -> None
+    Next(_, t) -> Some(t)
+  }
+}
+
+/// Map for non empty lists.
+pub fn non_empty_map(f: fn(a) -> b) -> fn(NonEmpty(a)) -> NonEmpty(b) {
+  fn(fa: NonEmpty(a)) -> NonEmpty(b) {
+    case fa {
+      Leaf(x) -> Leaf(f(x))
+      Next(x, xs) -> Next(f(x), non_empty_map(f)(xs))
+    }
+  }
+}
+
+/// Concat for non empty lists.
+pub fn non_empty_concat(x: NonEmpty(a), y: NonEmpty(a)) -> NonEmpty(a) {
+  case x {
+    Leaf(x) -> Next(x, y)
+    Next(x, xs) -> Next(x, non_empty_concat(xs, y))
+  }
+}
+
+/// Flat map for non empty lists.
+pub fn non_empty_flat_map(
+  va: NonEmpty(a),
+  f: fn(a) -> NonEmpty(b),
+) -> NonEmpty(b) {
+  case va {
+    Leaf(x) -> f(x)
+    Next(x, xs) -> non_empty_concat(f(x), non_empty_flat_map(xs, f))
+  }
+}

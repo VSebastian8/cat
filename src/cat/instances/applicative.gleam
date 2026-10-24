@@ -1,19 +1,20 @@
 //// `Applicative` instances: Identity, Option, List, Const, Tuple, Pair, Either, Triple Writer, Reader, Function.
 
 import cat.{
-  type Const, type Either, type Identity, type Pair, type Reader, type Writer,
-  Const, Identity, Left, Pair, Reader, Right, Writer, constant,
+  type Const, type Either, type Identity, type NonEmpty, type Pair, type Reader,
+  type Writer, Const, Identity, Leaf, Left, Pair, Reader, Right, Writer,
+  constant,
 }
 import cat/applicative.{type Applicative, Applicative}
 import cat/instances/functor.{
   const_functor, either_functor, function_functor, identity_functor,
-  list_functor, option_functor, pair_functor, reader_functor, result_functor,
-  triple_functor, tuple_functor, writer_functor,
+  list_functor, non_empty_functor, option_functor, pair_functor, reader_functor,
+  result_functor, triple_functor, tuple_functor, writer_functor,
 }
 import cat/instances/types.{
   type ConstF, type EitherF, type FunctionF, type IdentityF, type ListF,
-  type OptionF, type PairF, type ReaderF, type ResultF, type TripleF,
-  type TupleF, type WriterF,
+  type NonEmptyF, type OptionF, type PairF, type ReaderF, type ResultF,
+  type TripleF, type TupleF, type WriterF,
 }
 import cat/monoid.{type Monoid}
 import gleam/list
@@ -393,5 +394,21 @@ pub fn function_applicative() -> Applicative(
 ) {
   Applicative(function_functor(), pure: fn(x) { constant(x) }, apply: fn(rg) {
     fn(rf) { fn(r) { rg(r)(rf(r)) } }
+  })
+}
+
+/// Instance for `Applicative NonEmpty`.
+pub fn non_empty_applicative() -> Applicative(
+  NonEmptyF,
+  a,
+  b,
+  NonEmpty(a),
+  NonEmpty(b),
+  NonEmpty(fn(a) -> b),
+) {
+  Applicative(non_empty_functor(), pure: fn(x) { Leaf(x) }, apply: fn(lf) {
+    fn(la) {
+      lf |> cat.non_empty_flat_map(fn(f) { la |> non_empty_functor().fmap(f) })
+    }
   })
 }

@@ -1,14 +1,14 @@
 //// `Functor` instances: Option, List, Reader, Writer, Const, Tuple, Triple, Pair, Either.
 
 import cat.{
-  type Const, type Either, type Identity, type Pair, type Reader, type Writer,
-  Const, Identity, Left, Pair, Reader, Right, Writer, fish,
+  type Const, type Either, type Identity, type NonEmpty, type Pair, type Reader,
+  type Writer, Const, Identity, Left, Pair, Reader, Right, Writer, fish,
 }
 import cat/functor.{type Functor, Functor}
 import cat/instances/types.{
   type ConstF, type EitherF, type FunctionF, type IdentityF, type ListF,
-  type OptionF, type PairF, type ReaderF, type ResultF, type TripleF,
-  type TupleF, type WriterF,
+  type NonEmptyF, type OptionF, type PairF, type ReaderF, type ResultF,
+  type TripleF, type TupleF, type WriterF,
 }
 import gleam/option.{type Option, None, Some}
 
@@ -248,4 +248,9 @@ pub fn function_functor() -> Functor(FunctionF(r), a, b, fn(r) -> a, fn(r) -> b)
   Functor(fmap: fn(f: fn(a) -> b) -> fn(fn(r) -> a) -> fn(r) -> b {
     fn(g: fn(r) -> a) -> fn(r) -> b { cat.compose(f, g) }
   })
+}
+
+/// `NonEmpty Functor Instance`.
+pub fn non_empty_functor() -> Functor(NonEmptyF, a, b, NonEmpty(a), NonEmpty(b)) {
+  Functor(fmap: cat.non_empty_map)
 }

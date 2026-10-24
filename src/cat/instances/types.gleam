@@ -66,3 +66,6 @@ pub type ArrowPro
 
 /// Phantom type for the `state monad`.
 pub type StateM(s)
+
+/// Phantom type for `NonEmpty`.
+pub type NonEmptyF

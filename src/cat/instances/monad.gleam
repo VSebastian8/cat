@@ -1,12 +1,12 @@
 //// Monad instances: Identity, Option, List, Result, Writer, Reader, State.
 
 import cat.{
-  type Identity, type Reader, type State, type Writer, Identity, Reader, State,
-  Writer,
+  type Identity, type NonEmpty, type Reader, type State, type Writer, Identity,
+  Leaf, Reader, State, Writer,
 }
 import cat/instances/types.{
-  type FunctionF, type IdentityF, type ListF, type OptionF, type ReaderF,
-  type ResultF, type StateM, type WriterF,
+  type FunctionF, type IdentityF, type ListF, type NonEmptyF, type OptionF,
+  type ReaderF, type ResultF, type StateM, type WriterF,
 }
 import cat/monad.{type Monad, Monad, new}
 import gleam/list
@@ -247,4 +247,11 @@ pub fn state_monad() -> Monad(StateM(s), a, b, State(s, a), State(s, b)) {
       })
     },
   )
+}
+
+/// Monad instance for `NonEmpty`.
+pub fn non_empty_monad() -> Monad(NonEmptyF, a, b, NonEmpty(a), NonEmpty(b)) {
+  Monad(return: fn(x) { Leaf(x) }, bind: cat.non_empty_flat_map, map: fn(va, f) {
+    cat.non_empty_map(f)(va)
+  })
 }
