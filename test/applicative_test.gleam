@@ -245,3 +245,18 @@ pub fn function_app_test() {
   g(2)
   |> should.equal(14)
 }
+
+/// Testing applicative of non empty.
+pub fn non_empty_app_test() {
+  let funs =
+    cat.Next(
+      fn(x) { x + 2 },
+      cat.Next(fn(x) { x * 2 }, cat.Leaf(fn(x) { x + 2 * 2 })),
+    )
+  let args = cat.Next(1, cat.Leaf(2))
+  app.non_empty_applicative().apply(funs)(args)
+  |> should.equal(cat.Next(
+    3,
+    cat.Next(4, cat.Next(2, cat.Next(4, cat.Next(5, cat.Leaf(6))))),
+  ))
+}

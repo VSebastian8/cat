@@ -398,6 +398,16 @@ pub fn function_applicative() -> Applicative(
 }
 
 /// Instance for `Applicative NonEmpty`.
+/// ### Examples
+/// ```gleam
+/// let funs = 
+///   Next(fn(x) { x + 2 }, 
+///   Next(fn(x) { x * 2 },
+///   Leaf(fn(x) { x + 2 * 2 })))
+/// let args = Next(1, Leaf(2))
+/// non_empty_applicative().apply(funs)(args)
+/// // -> Next(3, Next(4, Next(2, Next(4, Next(5, Leaf(6))))))
+/// ```
 pub fn non_empty_applicative() -> Applicative(
   NonEmptyF,
   a,

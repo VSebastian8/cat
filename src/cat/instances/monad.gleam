@@ -250,6 +250,15 @@ pub fn state_monad() -> Monad(StateM(s), a, b, State(s, a), State(s, b)) {
 }
 
 /// Monad instance for `NonEmpty`.
+/// ### Examples
+/// ```gleam
+/// {
+///   use x <- non_empty_monad().bind(Next(2, Leaf(3)))
+///   use y <- non_empty_monad().bind(Next("apples", Leaf("pears")))
+///   non_empty_monad().return(int.to_string(x) <> " " <> y)
+/// }
+/// // -> Next("2 apples", Next("2 pears", Next("3 apples", Leaf("3 pears"))))
+/// ```
 pub fn non_empty_monad() -> Monad(NonEmptyF, a, b, NonEmpty(a), NonEmpty(b)) {
   Monad(return: fn(x) { Leaf(x) }, bind: cat.non_empty_flat_map, map: fn(va, f) {
     cat.non_empty_map(f)(va)

@@ -16,7 +16,7 @@ pub type Comonad(w, a, b, wa, wb, wwa) {
   Comonad(
     extract: fn(wa) -> a,
     duplicate: fn(wa) -> wwa,
-    extend: fn(fn(wa) -> b, wa) -> wb,
+    extend: fn(wa, fn(wa) -> b) -> wb,
   )
 }
 
@@ -24,5 +24,5 @@ pub type Comonad(w, a, b, wa, wb, wwa) {
 pub fn to_functor(
   w: Comonad(f, a, b, wa, wb, wwa),
 ) -> Functor(f, a, b, wa, wb) {
-  Functor(fmap: fn(f) { fn(wx) { w.extend(fn(wy) { f(w.extract(wy)) }, wx) } })
+  Functor(fmap: fn(f) { fn(wx) { w.extend(wx, fn(wy) { f(w.extract(wy)) }) } })
 }

@@ -154,3 +154,12 @@ pub fn writer_functor_test() {
   |> fun.writer_functor().fmap(fn(x) { x % 4 == 0 })
   |> should.equal(cat.Writer(True, "message"))
 }
+
+/// Testing the non empty list functor instance.
+pub fn non_empty_functor_test() {
+  fun.non_empty_functor().fmap(int.to_string)(cat.Next(
+    1,
+    cat.Next(3, cat.Leaf(4)),
+  ))
+  |> should.equal(cat.Next("1", cat.Next("3", cat.Leaf("4"))))
+}

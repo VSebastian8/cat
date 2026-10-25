@@ -251,6 +251,13 @@ pub fn function_functor() -> Functor(FunctionF(r), a, b, fn(r) -> a, fn(r) -> b)
 }
 
 /// `NonEmpty Functor Instance`.
+/// ### Examples
+/// ```gleam
+/// non_empty_functor().fmap(int.to_string)(
+///   Next(1, Next(3, Leaf(4)))
+/// )
+/// // -> Next("1", Next("3", Leaf("4")))
+/// ```
 pub fn non_empty_functor() -> Functor(NonEmptyF, a, b, NonEmpty(a), NonEmpty(b)) {
   Functor(fmap: cat.non_empty_map)
 }

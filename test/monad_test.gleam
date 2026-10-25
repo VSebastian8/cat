@@ -1,7 +1,7 @@
 import cat.{Identity, Reader, State, Writer}
 import cat/instances/monad.{
-  function_monad, identity_monad, list_monad, option_monad, reader_monad,
-  result_monad, state_monad, writer_monad,
+  function_monad, identity_monad, list_monad, non_empty_monad, option_monad,
+  reader_monad, result_monad, state_monad, writer_monad,
 }
 import gleam/int
 import gleam/option.{None, Some}
@@ -129,4 +129,17 @@ pub fn state_monad_test() {
     // 1 + 2 + 3
   }.run(1)
   |> should.equal(#(6, 4))
+}
+
+// Testing the list non empty monad instance.
+pub fn non_empty_monad_test() {
+  {
+    use x <- non_empty_monad().bind(cat.Next(2, cat.Leaf(3)))
+    use y <- non_empty_monad().bind(cat.Next("apples", cat.Leaf("pears")))
+    non_empty_monad().return(int.to_string(x) <> " " <> y)
+  }
+  |> should.equal(cat.Next(
+    "2 apples",
+    cat.Next("2 pears", cat.Next("3 apples", cat.Leaf("3 pears"))),
+  ))
 }
