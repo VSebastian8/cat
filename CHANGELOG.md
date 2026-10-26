@@ -1,5 +1,9 @@
 # Changelog
 
+## v.1.3.0 - 2026-10-26
+
+- `Comonad` type and instances
+
 ## v1.2.0 - 2025-07-20
 
 - `Alternative` type and instances

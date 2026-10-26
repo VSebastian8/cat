@@ -5,6 +5,9 @@ import cat/functor.{type Functor, Functor}
 /// `Comonad` type.
 /// ```
 /// class Functor w => Comonad w where
+///   extract :: w a -> a
+///   duplicate :: w a -> w (w a)
+///   extend :: (w a -> b) -> w a -> w b
 /// ```
 /// From this type you can construct a Functor instance containing a useful `map` function. Also, `extend` and `duplicate` can be expressed in terms of each other:
 /// ```
